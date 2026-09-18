@@ -1,0 +1,13 @@
+node_modules/
+.DS_Store
+
+# local runtime, not source
+logs/
+stock-data/
+*.zip
+.pre-monorepo/
+
+# rsc-data-server's accounts and their backups
+rsc-data-server/*.sqlite
+rsc-data-server/*.sqlite-*
+rsc-data-server/backups/
