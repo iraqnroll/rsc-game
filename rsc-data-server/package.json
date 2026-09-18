@@ -1,0 +1,44 @@
+{
+  "name": "@2003scape/rsc-data-server",
+  "version": "1.0.0",
+  "description": "manage rsc-server worlds, player persistence, friends, etc.",
+  "main": "./src/server.js",
+  "bin": {
+    "rsc-data-server": "./src/bin.js"
+  },
+  "scripts": {
+    "start": "./src/bin.js -v debug | garnish"
+  },
+  "author": "2003Scape Team",
+  "license": "AGPL-3.0+",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^7.1.1",
+    "bole": "^4.0.0",
+    "camelcase-keys": "^6.2.2",
+    "json-socket": "^0.3.0",
+    "sleep-promise": "^8.0.1",
+    "snakecase-keys": "^3.2.0",
+    "string-strip-html": "^7.0.3",
+    "yargs": "^15.4.1"
+  },
+  "devDependencies": {
+    "garnish": "^5.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/2003scape/rsc-data-server.git"
+  },
+  "keywords": [
+    "runescape",
+    "classic",
+    "mmorpg",
+    "game",
+    "server",
+    "loginserver"
+  ],
+  "bugs": {
+    "url": "https://github.com/2003scape/rsc-data-server/issues"
+  },
+  "homepage": "https://github.com/2003scape/rsc-data-server#readme"
+}
