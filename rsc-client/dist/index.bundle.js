@@ -22,7 +22,7 @@ if (typeof window === 'undefined') {
     });
 
     mc.members = args[0] === 'members';
-    mc.server = args[1] ? args[1] : '127.0.0.1';
+    mc.server = args[1] ? args[1] : window.location.hostname; // rsc-editor patch
     mc.port = args[2] && !isNaN(+args[2]) ? +args[2] : 43595;
 
     mc.threadSleep = 10;
@@ -40707,7 +40707,7 @@ class GameShell {
         this._canvas.addEventListener('keydown', this.keyPressed.bind(this));
         this._canvas.addEventListener('keyup', this.keyReleased.bind(this));
 
-        window.addEventListener('beforeunload', () => this.onClosing());
+        //window.addEventListener('beforeunload', () => this.onClosing());
 
         if (this.options.mobile) {
             this.toggleKeyboard = false;
@@ -41700,7 +41700,9 @@ class Socket {
         return new Promise((resolve, reject) => {
             if (typeof this.host === 'string') {
                 this.client = new WebSocket(
-                    `ws://${this.host}:${this.port}`,
+                    typeof location !== 'undefined' && location.protocol === 'https:'
+                        ? `wss://${location.host}/ws` // rsc-editor patch
+                        : `ws://${this.host}:${this.port}`,
                     'binary'
                 );
             } else if (this.host.constructor.name === 'Worker') {

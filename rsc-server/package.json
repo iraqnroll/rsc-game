@@ -50,5 +50,8 @@
     "idb-keyval": "^5.0.6",
     "typedarray-to-buffer": "^4.0.0",
     "uglify-js": "^3.13.10"
+  },
+  "overrides": {
+    "canvas": "^3.2.0"
   }
 }

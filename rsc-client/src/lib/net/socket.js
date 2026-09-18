@@ -35,7 +35,9 @@ class Socket {
         return new Promise((resolve, reject) => {
             if (typeof this.host === 'string') {
                 this.client = new WebSocket(
-                    `ws://${this.host}:${this.port}`,
+                    typeof location !== 'undefined' && location.protocol === 'https:'
+                        ? `wss://${location.host}/ws` // rsc-editor patch
+                        : `ws://${this.host}:${this.port}`,
                     'binary'
                 );
             } else if (this.host.constructor.name === 'Worker') {
