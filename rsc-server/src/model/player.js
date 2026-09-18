@@ -5,6 +5,7 @@ const Inventory = require('./inventory');
 const LocalEntities = require('./local-entities');
 const Trade = require('./trade');
 const log = require('bole')('player');
+const { MODERATOR, rankName } = require('../ranks');
 const prayers = require('@2003scape/rsc-data/config/prayers');
 const quests = require('@2003scape/rsc-data/quests');
 const regions = require('@2003scape/rsc-data/regions');
@@ -211,7 +212,12 @@ class Player extends Character {
             this.sendAppearance();
         }
 
+        this.sessionStart = Date.now();
         this.message('Welcome to RuneScape!');
+
+        if (this.rank >= MODERATOR) {
+            this.message(`@yel@You are a${this.rank >= 3 ? 'n' : ''} ${rankName(this.rank)}: ::help lists your commands`);
+        }
 
         this.localEntities.updateNearby('npcs');
         this.localEntities.updateNearby('players');
