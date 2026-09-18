@@ -11,5 +11,6 @@
     "experienceRate": 1,
     "fatigue": true,
     "bankCertificates": false,
-    "rememberCombatStyle": false
+    "rememberCombatStyle": false,
+    "adminSocket": "/tmp/rsc-game-world-1.sock"
 }

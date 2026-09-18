@@ -45,4 +45,14 @@ bole.output({
 
     const server = new Server(config);
     await server.init();
+
+    // `systemctl stop` / `restart`: log everyone out -- which saves them --
+    // before exiting. Before this, a restart lost everything since each
+    // player's last logout.
+    for (const signal of ['SIGTERM', 'SIGINT']) {
+        process.once(signal, () => {
+            log.info(`${signal}: saving players and stopping`);
+            server.control.stop();
+        });
+    }
 })();

@@ -12,6 +12,25 @@ const packetHandlers = require('./packet-handlers');
 const toBuffer = process.browser ? require('typedarray-to-buffer') : undefined;
 const ws = require('ws');
 
+const LOOPBACK = new Set(['127.0.0.1', '::1', '::ffff:127.0.0.1']);
+
+// The client address a local reverse proxy vouches for, or undefined. Only a
+// connection from this machine may set it -- anyone else could claim any
+// address they liked. deploy/game/rsc-game.caddy sends it as X-Real-IP.
+function forwardedIP(request) {
+    if (!request || !LOOPBACK.has(request.socket.remoteAddress)) {
+        return undefined;
+    }
+
+    const header = request.headers['x-real-ip'];
+
+    if (typeof header !== 'string' || !/^[0-9a-fA-F.:]{3,45}$/.test(header)) {
+        return undefined;
+    }
+
+    return header.replace(/^::ffff:/, '');
+}
+
 class Server {
     constructor(config) {
         this.config = config;
@@ -40,8 +59,15 @@ class Server {
         }
     }
 
-    handleConnection(socket) {
+    // `realIP`: the player's address as the proxy in front saw it (see
+    // bindWebSocket). Without it every player behind Caddy is 127.0.0.1, and
+    // the data server's players-per-IP limit lets only one of them log in.
+    handleConnection(socket, realIP) {
         socket = new RSCSocket(socket);
+
+        if (realIP) {
+            socket.getIPAddress = () => realIP;
+        }
         socket.setTimeout(5000);
         socket.server = this;
 
@@ -118,11 +144,30 @@ class Server {
         this.websocketServer = new ws.Server({ port });
         this.websocketServer.on('error', (err) => log.error(err));
 
-        this.websocketServer.on('connection', (socket) => {
-            this.handleConnection(socket);
+        this.websocketServer.on('connection', (socket, request) => {
+            this.handleConnection(socket, forwardedIP(request));
         });
 
         log.info(`listening for websocket connections on port ${port}`);
+    }
+
+    // RSC Editor's way in; see src/admin. Off unless the config names a path.
+    async bindControl() {
+        const { Control } = require('./admin/control');
+        const { ControlServer } = require('./admin/control-server');
+
+        this.control = new Control(this);
+
+        if (this.config.adminSocket) {
+            this.controlServer = new ControlServer(this.control, {
+                path: this.config.adminSocket,
+                mode: this.config.adminSocketMode
+                    ? parseInt(this.config.adminSocketMode, 8)
+                    : 0o660
+            });
+            await this.controlServer.listen();
+            this.control.onStop = () => this.controlServer.close();
+        }
     }
 
     bindWebWorker() {
@@ -190,6 +235,7 @@ class Server {
             } else {
                 await this.bindTCP();
                 this.bindWebSocket();
+                await this.bindControl();
             }
         } catch (e) {
             console.error(e);
@@ -200,3 +246,4 @@ class Server {
 }
 
 module.exports = Server;
+module.exports.forwardedIP = forwardedIP;
