@@ -1,4 +1,5 @@
 const Item = require('./item');
+const { eventsOf } = require('../admin/events');
 const items = require('@2003scape/rsc-data/config/items');
 const { formatSkillName } = require('../skills');
 
@@ -205,6 +206,13 @@ class Inventory {
 
         this.player.world.addPlayerDrop(this.player, item);
         this.player.sendSound('dropobject');
+        eventsOf(this.player).emit('drop', this.player.username, {
+            item: item.id,
+            name: item.definition ? item.definition.name : undefined,
+            amount: item.amount || 1,
+            x: this.player.x,
+            y: this.player.y
+        });
 
         this.sendRemove(index);
     }

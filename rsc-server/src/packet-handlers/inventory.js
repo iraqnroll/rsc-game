@@ -1,3 +1,5 @@
+const { eventsOf } = require('../admin/events');
+
 function getGroundItem(player, id, x, y) {
     const { world } = player;
 
@@ -61,6 +63,20 @@ async function groundItemTake({ player }, { x, y, id }) {
         world.removeEntity('groundItems', groundItem);
         player.inventory.add(groundItem);
         player.sendSound('takeobject');
+        // Whose it was: an item a player dropped for another is how things
+        // change hands while trading is a stub (model/trade.js).
+        eventsOf(player).emit(
+            'pickup',
+            player.username,
+            {
+                item: groundItem.id,
+                name: groundItem.definition ? groundItem.definition.name : undefined,
+                amount: groundItem.amount || 1,
+                x: groundItem.x,
+                y: groundItem.y
+            },
+            groundItem.ownerName && groundItem.ownerName !== player.username ? groundItem.ownerName : null
+        );
     };
 }
 

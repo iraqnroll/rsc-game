@@ -365,6 +365,7 @@ class World {
         });
 
         groundItem.owner = player.id;
+        groundItem.ownerName = player.username;
 
         // if we never delete the owner property, it never shows up to other
         // players and still disappears after DROP_DISAPPEAR_TIMEOUT

@@ -37,6 +37,11 @@ class Server {
         this.isBrowser = !!process.browser;
 
         this.world = new World(this);
+
+        if (!process.browser) {
+            const { EventLog } = require('./admin/events');
+            this.events = new EventLog({ spool: config.eventSpool, worldId: config.worldID });
+        }
         this.dataClient = new DataClient(this);
 
         this.incomingMessages = new Map();
@@ -167,6 +172,8 @@ class Server {
             });
             await this.controlServer.listen();
             this.control.onStop = () => this.controlServer.close();
+            // A nudge: the editor fetches in order with eventsSince.
+            this.events.onEvent((event) => this.controlServer.publish(event));
         }
     }
 

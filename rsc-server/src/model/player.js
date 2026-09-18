@@ -6,6 +6,7 @@ const LocalEntities = require('./local-entities');
 const Trade = require('./trade');
 const log = require('bole')('player');
 const { MODERATOR, rankName } = require('../ranks');
+const { eventsOf } = require('../admin/events');
 const prayers = require('@2003scape/rsc-data/config/prayers');
 const quests = require('@2003scape/rsc-data/quests');
 const regions = require('@2003scape/rsc-data/regions');
@@ -213,6 +214,12 @@ class Player extends Character {
         }
 
         this.sessionStart = Date.now();
+        eventsOf(this).emit('login', this.username, {
+            ip: this.socket && this.socket.getIPAddress ? this.socket.getIPAddress() : null,
+            rank: this.rank,
+            x: this.x,
+            y: this.y
+        });
         this.message('Welcome to RuneScape!');
 
         if (this.rank >= MODERATOR) {
@@ -237,6 +244,12 @@ class Player extends Character {
         }
 
         this.loggedIn = false;
+
+        eventsOf(this).emit('logout', this.username, {
+            seconds: this.sessionStart ? Math.round((Date.now() - this.sessionStart) / 1000) : null,
+            x: this.x,
+            y: this.y
+        });
 
         if (this.dontAnswer) {
             this.dontAnswer();
@@ -859,6 +872,20 @@ class Player extends Character {
         for (const item of this.inventory.items) {
             world.addPlayerDrop(this, item);
         }
+
+        const killer = victor ? victor.username || (victor.definition && victor.definition.name) || 'npc' : null;
+        eventsOf(this).emit(
+            'death',
+            this.username,
+            {
+                x: this.x,
+                y: this.y,
+                killerIsPlayer: !!(victor && victor.username),
+                dropped: this.inventory.items.map((i) => ({ id: i.id, amount: i.amount || 1 })),
+                kept: itemsKept.map((i) => ({ id: i.id, amount: i.amount || 1 }))
+            },
+            killer
+        );
 
         this.inventory.items.length = 0;
 

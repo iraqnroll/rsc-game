@@ -1,3 +1,5 @@
+const { eventsOf } = require('../admin/events');
+
 const MAX_SOCIAL_LIST_LENGTH = 100;
 
 async function friendAdd({ player }, { username }) {
@@ -64,6 +66,7 @@ async function privateMessage({ player }, { username, message }) {
     if (player.canChat()) {
         player.lastChat = Date.now();
         player.sendPrivateMessage(username, message);
+        eventsOf(player).emit('pm', player.username, { message }, username);
     }
 }
 

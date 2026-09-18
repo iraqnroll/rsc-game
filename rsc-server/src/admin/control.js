@@ -6,6 +6,12 @@
 // the editor, its only client, audits every call.
 
 const { rankName } = require('../ranks');
+const { eventsOf } = require('./events');
+
+// Actions taken through the socket appear in the world's own event log too.
+function adminEvent(control, action, details, target = null) {
+    eventsOf({ world: control.world }).emit('admin', null, { action, ...details }, target);
+}
 
 // rsc-socket's encoder writes `seconds * 50`, and the 204 client multiplies
 // what it receives by 32 before counting it down at 50 a second -- so the
@@ -68,12 +74,14 @@ class Control {
         const text = message.trim().slice(0, 200);
         const players = this.online();
         for (const p of players) p.message(`@yel@${text}`);
+        adminEvent(this, 'broadcast', { message: text, sent: players.length });
         return { sent: players.length };
     }
 
     async kick({ username }) {
         const player = this.world.getPlayerByUsername(String(username || ''));
         if (!player) throw new Error(`${username} is not online`);
+        adminEvent(this, 'kick', {}, player.username);
         await player.logout();
         return { kicked: player.username };
     }
@@ -98,6 +106,7 @@ class Control {
             if (secs > 0) sendCountdown(p, secs);
             if (text) p.message(`@yel@${text}`);
         }
+        adminEvent(this, stop ? 'restart' : 'countdown', { seconds: secs, reason: text });
         this.shutdown = {
             at,
             reason: text,
@@ -138,7 +147,11 @@ const COMMANDS = {
     kick: (c, args) => c.kick(args),
     saveAll: (c) => c.saveAll(),
     shutdown: (c, args) => c.shutdownIn(args),
-    cancelShutdown: (c) => c.cancelShutdown()
+    cancelShutdown: (c) => c.cancelShutdown(),
+    eventsSince: (c, { seq = 0, limit = 1000 } = {}) => ({
+        events: c.server.events.since(Number(seq) || 0, Math.min(Number(limit) || 1000, 5000))
+    }),
+    ackEvents: (c, { seq }) => c.server.events.ack(Number(seq) || 0)
 };
 
 module.exports = { Control, COMMANDS, sendCountdown };
