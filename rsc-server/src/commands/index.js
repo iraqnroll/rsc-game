@@ -14,9 +14,9 @@
 
 const NPC = require('../model/npc');
 const items = require('@2003scape/rsc-data/config/items');
-const regions = require('@2003scape/rsc-data/regions');
 const { MODERATOR, ADMINISTRATOR, rankName } = require('../ranks');
 const { TYPES, FINDABLE, search } = require('./args');
+const { destination } = require('../teleport');
 
 const MAX_FIND = 8;
 
@@ -127,21 +127,47 @@ const COMMANDS = {
         help: 'teleport to coordinates, or to a region by name (::find region)',
         example: '::teleport 120 648  or  ::teleport lumbridge',
         run(player, [where, y]) {
-            if (/^\d+$/.test(where)) {
-                if (y === undefined) {
-                    player.message('@red@give both x and y, or a region name');
-                    return;
-                }
-                player.teleport(Number(where), y, true);
+            const to = /^\d+$/.test(where) ? destination({ x: where, y }) : destination({ region: where });
+            if (to.error) {
+                player.message(`@red@${to.error}`);
                 return;
             }
-            const region = TYPES.region(where);
-            if (region.error) {
-                player.message(`@red@${region.error}`);
+            player.teleport(to.x, to.y, true);
+        }
+    },
+
+    bring: {
+        rank: MODERATOR,
+        group: 'moderator',
+        args: [{ name: 'player', type: 'player' }],
+        help: 'pull a player to where you stand',
+        example: '::bring some_player',
+        run(player, [other]) {
+            other.teleport(player.x, player.y, true);
+            other.message(`@yel@${player.username} brought you here.`);
+            player.message(`brought ${other.username} to you`);
+        }
+    },
+
+    send: {
+        rank: MODERATOR,
+        group: 'moderator',
+        args: [
+            { name: 'player', type: 'player' },
+            { name: 'x|region', type: 'text' },
+            { name: 'y', type: 'int', optional: true }
+        ],
+        help: 'teleport a player to coordinates, or to a region by name',
+        example: '::send some_player lumbridge  or  ::send some_player 120 648',
+        run(player, [other, where, y]) {
+            const to = /^\d+$/.test(where) ? destination({ x: where, y }) : destination({ region: where });
+            if (to.error) {
+                player.message(`@red@${to.error}`);
                 return;
             }
-            const { spawnX, spawnY } = regions[region.value];
-            player.teleport(spawnX, spawnY, true);
+            other.teleport(to.x, to.y, true);
+            other.message(`@yel@${player.username} moved you.`);
+            player.message(`sent ${other.username} to ${to.region || `${to.x}, ${to.y}`}`);
         }
     },
 

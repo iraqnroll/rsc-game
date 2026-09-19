@@ -120,3 +120,18 @@ test('every command has help, and a usage that matches its arguments', () => {
         assert.ok(usage(name, cmd).startsWith(`::${name}`));
     }
 });
+
+test('bring and send move another player; players cannot', async () => {
+    const world = fakeWorld();
+    const mod = fakePlayer(world, 'mod', MODERATOR);
+    const bob = fakePlayer(world, 'bob', PLAYER);
+    mod.x = 300; mod.y = 400;
+    assert.equal((await runCommand(mod, 'bring', ['bob'])).ran, true);
+    assert.deepEqual([bob.x, bob.y], [300, 400]);
+    assert.equal(bob.messages.at(-1), '@yel@mod brought you here.');
+    await runCommand(mod, 'send', ['bob', '10', '20']);
+    assert.deepEqual([bob.x, bob.y], [10, 20]);
+    await runCommand(mod, 'send', ['bob', 'lumbridge']);
+    assert.notDeepEqual([bob.x, bob.y], [10, 20]);
+    assert.equal((await runCommand(bob, 'bring', ['mod'])).ran, false);
+});

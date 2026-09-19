@@ -241,3 +241,17 @@ test('a password reset hands back the new password', async () => {
         password: 'abc234def567'
     });
 });
+
+test('a teleport moves an online player and tells them', () => {
+    const server = fakeServer(['admin', 'bob']);
+    const control = new Control(server);
+    const bob = server.players[1];
+    bob.teleport = (x, y) => { bob.x = x; bob.y = y; };
+    assert.deepEqual(control.teleport({ username: 'bob', region: 'lumbridge', reason: 'stuck' }), { username: 'bob', x: bob.x, y: bob.y });
+    assert.equal(bob.messages.at(-1), '@yel@A moderator moved you. (stuck)');
+    control.teleport({ username: 'bob', x: 120, y: 648 });
+    assert.deepEqual([bob.x, bob.y], [120, 648]);
+    assert.throws(() => control.teleport({ username: 'bob', x: 99999, y: 1 }), /x must be/);
+    assert.throws(() => control.teleport({ username: 'bob', region: 'narnia' }), /no region/);
+    assert.throws(() => control.teleport({ username: 'ghost', region: 'lumbridge' }), /not online/);
+});

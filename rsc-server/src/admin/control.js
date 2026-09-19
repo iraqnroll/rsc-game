@@ -7,6 +7,7 @@
 
 const { rankName, PLAYER, MODERATOR, ADMINISTRATOR } = require('../ranks');
 const { experienceToLevel } = require('../skills');
+const { destination } = require('../teleport');
 const { eventsOf } = require('./events');
 
 // Actions taken through the socket appear in the world's own event log too.
@@ -216,6 +217,18 @@ class Control {
         return { username: name, until: untilText(until), kicked: !!(player && until !== 0) };
     }
 
+    // Move an online player: to coordinates, or a region by name.
+    teleport({ username, x, y, region, reason = '' }) {
+        const player = this.onlinePlayer(username);
+        if (!player) throw new Error(`${username} is not online`);
+        const to = destination({ x, y, region });
+        if (to.error) throw new Error(to.error);
+        player.teleport(to.x, to.y, true);
+        player.message(`@yel@A moderator moved you.${reason ? ` (${reason})` : ''}`);
+        adminEvent(this, 'teleport', { x: to.x, y: to.y, region: to.region }, player.username);
+        return { username: player.username, x: to.x, y: to.y };
+    }
+
     async resetPassword({ username }) {
         const reply = await this.data('adminResetPassword', { username });
         adminEvent(this, 'password-reset', {}, reply.username);
@@ -270,7 +283,8 @@ const COMMANDS = {
     setRank: (c, args) => c.setRank(args),
     mute: (c, args) => c.mute(args),
     ban: (c, args) => c.ban(args),
-    resetPassword: (c, args) => c.resetPassword(args)
+    resetPassword: (c, args) => c.resetPassword(args),
+    teleport: (c, args) => c.teleport(args)
 };
 
 module.exports = { Control, COMMANDS, sendCountdown };
