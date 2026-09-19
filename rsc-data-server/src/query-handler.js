@@ -303,12 +303,16 @@ class QueryHandler {
         return new Date(ms * 1000);
     }
 
+    // Both statements read `SET <value> = ? WHERE username = ?`: the value
+    // comes first. Upstream passed the username first, so neither ever
+    // matched a row -- an expired ban was never cleared, and playerLogin,
+    // which clears it and tries again, retried forever.
     setPlayerBan(username, banEndDate) {
-        this.statements.setPlayerBan.run(username, Number(banEndDate) / 1000);
+        this.statements.setPlayerBan.run(Math.floor(Number(banEndDate) / 1000), username);
     }
 
     setPlayerPassword(username, password) {
-        this.statements.setPlayerPassword.run(username, password);
+        this.statements.setPlayerPassword.run(password, username);
     }
 
     getPlayer(username) {
