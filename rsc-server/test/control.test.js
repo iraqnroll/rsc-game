@@ -148,3 +148,96 @@ test('a countdown without stop leaves stopping to the caller', async () => {
     assert.equal(stopped, false);
     assert.equal(server.players[0].messages[0], '@yel@Publishing');
 });
+
+/* ------------------------------------------------------------ accounts -- */
+
+// A data server that remembers what it was told.
+function withData(server) {
+    const store = { bob: { rank: 0, ban: 0, mute: 0 } };
+    const calls = [];
+    server.dataClient = {
+        async sendAndReceive({ handler, ...args }) {
+            calls.push(handler);
+            const name = String(args.username).toLowerCase();
+            if (!store[name]) return { ok: false, error: `no account called ${args.username}` };
+            if (handler === 'adminSetRank') store[name].rank = args.rank;
+            if (handler === 'adminSetBan') store[name].ban = args.until;
+            if (handler === 'adminSetMute') store[name].mute = args.until;
+            if (handler === 'adminResetPassword') return { ok: true, username: name, password: 'abc234def567' };
+            if (handler === 'adminPlayerInfo') {
+                return {
+                    ok: true,
+                    account: { username: name, rank: store[name].rank, mutedUntil: null, skills: { attack: { current: 5, experience: 400 } } }
+                };
+            }
+            return { ok: true, username: name };
+        }
+    };
+    return { store, calls };
+}
+
+test('a mute reaches an online player at once and the account for later', async () => {
+    const server = fakeServer(['admin', 'bob']);
+    const { store } = withData(server);
+    const bob = server.players[1];
+    const control = new Control(server);
+
+    const before = Date.now();
+    const result = await control.mute({ username: 'Bob', minutes: 60, reason: 'spam' });
+    assert.equal(result.username, 'bob');
+    assert.ok(bob.muteEndDate >= before + 3600_000 - 5 && store.bob.mute === bob.muteEndDate);
+    assert.equal(bob.messages.at(-1), '@red@You have been muted for 1 hour. Reason: spam');
+
+    await control.mute({ username: 'bob', minutes: 0 });
+    assert.equal(bob.muteEndDate, 0);
+    await control.mute({ username: 'bob', minutes: -1 });
+    assert.equal(store.bob.mute, -1);
+});
+
+test('a ban kicks an online player; lifting it does not', async () => {
+    const server = fakeServer(['admin', 'bob']);
+    const { store } = withData(server);
+    const bob = server.players[1];
+    const control = new Control(server);
+
+    const result = await control.ban({ username: 'bob', minutes: 1440 * 7, reason: 'cheating' });
+    assert.equal(result.kicked, true);
+    assert.equal(bob.loggedOut, true);
+    assert.equal(bob.messages.at(-1), '@red@You have been banned for 7 days. Reason: cheating');
+    assert.ok(store.bob.ban > Date.now());
+
+    const lifted = await control.ban({ username: 'bob', minutes: 0 });
+    assert.equal(lifted.until, null);
+    assert.equal(store.bob.ban, 0);
+});
+
+test('rank changes apply to the running player, who saves it at logout', async () => {
+    const server = fakeServer(['admin', 'bob']);
+    const { store } = withData(server);
+    const control = new Control(server);
+    await control.setRank({ username: 'bob', rank: 2 });
+    assert.equal(server.players[1].rank, 2);
+    assert.equal(store.bob.rank, 2);
+    await assert.rejects(control.setRank({ username: 'bob', rank: 1 }), /rank must be/);
+});
+
+test('player info merges the account with what is true in the running world', async () => {
+    const server = fakeServer(['admin', 'bob']);
+    withData(server);
+    server.players[1].skills = { attack: { base: 10, current: 12, experience: 1200 } };
+    server.players[1].muteEndDate = -1;
+    const info = await new Control(server).playerInfo({ username: 'bob' });
+    assert.equal(info.mutedUntil, 'forever');
+    assert.deepEqual(info.skills.attack, { level: 10, current: 12, experience: 1200 });
+    assert.equal(info.online.ip, '10.0.0.2');
+    await assert.rejects(new Control(server).playerInfo({ username: 'ghost' }), /no account called ghost/);
+});
+
+test('a password reset hands back the new password', async () => {
+    const server = fakeServer(['admin']);
+    withData(server);
+    assert.deepEqual(await new Control(server).resetPassword({ username: 'bob' }), {
+        username: 'bob',
+        password: 'abc234def567'
+    });
+});

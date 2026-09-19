@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "./src/bin.js -v debug | garnish",
-    "set-rank": "node src/set-rank.js"
+    "set-rank": "node src/set-rank.js",
+    "test": "node --test test/*.test.js"
   },
   "author": "2003Scape Team",
   "license": "AGPL-3.0+",

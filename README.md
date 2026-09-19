@@ -21,7 +21,8 @@ one reason this repository is public.
 (cd rsc-server && npm install)
 (cd rsc-client && npm install && npm run build-dev)
 ./run.sh                      # http://localhost:1337/index.html
-(cd rsc-server && npm test)   # the command table's tests
+(cd rsc-server && npm test)   # commands, control socket, events
+(cd rsc-data-server && npm test)   # account admin handlers
 ./load-export.sh <export.zip> # then restart ./run.sh
 ```
 
@@ -52,6 +53,9 @@ given by id or name, and `::find item rune scimitar` looks ids up.
 |---|---|
 | moderator | `::help`, `::find`, `::coords`, `::kick`, `::goto`, `::teleport` |
 | administrator | `::give`, `::item`, `::npc`, `::addexp`, `::setqp`, `::setquest`, `::shop`, `::bank`, `::clearinventory`, `::appearance`, `::fatigue`, `::dmg`, `::droprandom`, and the debug ones (`::help` lists them) |
+
+RSC Editor's Player page (Worlds) does the same and more — mute, ban, rank,
+password reset — for players online or not, through the control socket.
 
 The table lives in `rsc-server/src/commands/index.js`; every command there
 states its rank, arguments, help line and an example. Every attempt, allowed

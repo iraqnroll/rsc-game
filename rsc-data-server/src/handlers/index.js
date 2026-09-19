@@ -1,4 +1,5 @@
 const handlers = [
+    require('./admin'),
     require('./authenticate'),
     require('./hiscores'),
     require('./web-content'),
