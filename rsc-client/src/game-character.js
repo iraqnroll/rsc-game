@@ -33,7 +33,9 @@ class GameCharacter {
         this.skullVisible = 0;
         this.waypointsX = new Int32Array(10);
         this.waypointsY = new Int32Array(10);
-        this.equippedItem = new Int32Array(12);
+        // 12 layers for what is worn, and a 13th for the halo, drawn last
+        // (rsc-server/src/halo.js).
+        this.equippedItem = new Int32Array(13);
         this.level = -1;
     }
 }

@@ -52,8 +52,8 @@ function questState(stage) {
 }
 
 // What one player's quest list looks like, in the order it is shown.
-function questListFor(questStages = {}) {
-    return QUESTS.map((q) => ({ name: q.name, members: q.members, state: questState(questStages[q.key]) }));
+function questListFor(questStages = {}, quests = QUESTS) {
+    return quests.map((q) => ({ name: q.name, members: q.members, state: questState(questStages[q.key]) }));
 }
 
 // questStages that tell the player's client whenever a quest moves on.

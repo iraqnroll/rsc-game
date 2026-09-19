@@ -9,6 +9,7 @@ const { MODERATOR, rankName } = require('../ranks');
 const { eventsOf } = require('../admin/events');
 const prayers = require('@2003scape/rsc-data/config/prayers');
 const { questListFor, watchQuestStages } = require('../quests');
+const { HALO_LAYER, haloLayerValue } = require('../halo');
 const regions = require('@2003scape/rsc-data/regions');
 const { formatSkillName, experienceToLevel } = require('../skills');
 
@@ -196,6 +197,12 @@ class Player extends Character {
     }
 
     login() {
+        // A new account's first login: it starts with the halo (src/halo.js).
+        if (!this.loginDate) {
+            this.cache.halo = true;
+        }
+        this.animations[HALO_LAYER] = haloLayerValue(this, this.world.server.config);
+
         this.world.addEntity('players', this);
 
         this.sendWorldInfo();
@@ -658,6 +665,19 @@ class Player extends Character {
 
     sendSleepIncorrect() {
         this.send({ type: 'sleepIncorrect' });
+    }
+
+    // Give or take the halo, and show everyone nearby. The quest that removes
+    // it calls setHalo(false); the flag is saved with the player.
+    setHalo(on) {
+        if (on) {
+            this.cache.halo = true;
+        } else {
+            delete this.cache.halo;
+        }
+        this.animations[HALO_LAYER] = haloLayerValue(this, this.world.server.config);
+        this.appearanceIndex += 1;
+        this.broadcastPlayerAppearance(true);
     }
 
     // update the player's avatar

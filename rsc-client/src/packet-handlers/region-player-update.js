@@ -128,7 +128,7 @@ module.exports = {
                         offset++;
                     }
 
-                    for (let j = equippedCount; j < 12; j++) {
+                    for (let j = equippedCount; j < 13; j++) {
                         player.equippedItem[j] = 0;
                     }
 

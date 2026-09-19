@@ -61,7 +61,8 @@ class Character extends Entity {
         // animation IDs
         // see https://github.com/2003scape/rsc-config#configanimations
         this.animations = [];
-        this.animations.length = 12;
+        // 12 for what is worn, and a 13th for the halo (src/halo.js).
+        this.animations.length = 13;
         this.animations.fill(0, this.animations.length);
 
         // used to calculate who should get the drop

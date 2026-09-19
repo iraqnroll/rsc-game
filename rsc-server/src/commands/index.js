@@ -240,6 +240,26 @@ const COMMANDS = {
         }
     },
 
+    halo: {
+        rank: ADMINISTRATOR,
+        group: 'administrator',
+        args: [
+            { name: 'on|off', type: 'text' },
+            { name: 'player', type: 'player', optional: true }
+        ],
+        help: 'give or take the halo (new players start with it; a quest removes it)',
+        example: '::halo off  or  ::halo on some_player',
+        run(player, [state, other]) {
+            if (state !== 'on' && state !== 'off') {
+                player.message('@red@say on or off');
+                return;
+            }
+            const who = other || player;
+            who.setHalo(state === 'on');
+            player.message(`${who.username} ${state === 'on' ? 'has' : 'no longer has'} the halo`);
+        }
+    },
+
     shop: {
         rank: ADMINISTRATOR,
         group: 'administrator',

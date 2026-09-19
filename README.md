@@ -81,6 +81,25 @@ is done. `::setquest <key> <stage>` sets a stage while testing, and
 `::find quest <text>` looks keys up. The quest's behaviour -- dialogue,
 stages, rewards -- is a plugin, like the ones in `rsc-server/src/plugins/quests`.
 
+## The halo
+
+Every new player starts with a halo over their head, and a quest takes it
+away. It is a 13th appearance layer, drawn over everything including hats and
+helmets, so it works with any head and never fights with equipment
+(`rsc-server/src/halo.js`, and `npcAnimationArray` in the client).
+
+- **The art** is a sprite set uploaded in RSC Editor's Assets screen, and an
+  animation definition named `halo` pointing at it (or set `haloAnimation` in
+  the server's config to another name or number). Draw the halo at the top of
+  the character box in every frame; draw it grey and give the definition a
+  colour to tint it. Its number must be 255 or less. Without it there is no
+  halo, and the game log says so.
+- **Who has it** is a flag saved with the player, `cache.halo`. New accounts
+  get it on their first login.
+- **Taking it away**, in the quest's plugin: `player.setHalo(false)`. It goes
+  at once, for everyone nearby, and stays gone.
+- **While testing**: `::halo off`, `::halo on`, `::halo on some_player`.
+
 ## On the server
 
 RSC Editor's `deploy/game/install.sh` clones this repository to

@@ -120,15 +120,18 @@ class mudclient extends GameConnection {
         this.newBankItemCount = 0;
 
         // the orders of the NPC animation slots at different angles
+        // The order layers are drawn in, per facing. Layer 12, the halo, is
+        // last in every one: on top of hats and helmets. NPCs draw the first
+        // twelve only.
         this.npcAnimationArray = [
-            new Int32Array([11, 2, 9, 7, 1, 6, 10, 0, 5, 8, 3, 4]),
-            new Int32Array([11, 2, 9, 7, 1, 6, 10, 0, 5, 8, 3, 4]),
-            new Int32Array([11, 3, 2, 9, 7, 1, 6, 10, 0, 5, 8, 4]),
-            new Int32Array([3, 4, 2, 9, 7, 1, 6, 10, 8, 11, 0, 5]),
-            new Int32Array([3, 4, 2, 9, 7, 1, 6, 10, 8, 11, 0, 5]),
-            new Int32Array([4, 3, 2, 9, 7, 1, 6, 10, 8, 11, 0, 5]),
-            new Int32Array([11, 4, 2, 9, 7, 1, 6, 10, 0, 5, 8, 3]),
-            new Int32Array([11, 2, 9, 7, 1, 6, 10, 0, 5, 8, 4, 3])];
+            new Int32Array([11, 2, 9, 7, 1, 6, 10, 0, 5, 8, 3, 4, 12]),
+            new Int32Array([11, 2, 9, 7, 1, 6, 10, 0, 5, 8, 3, 4, 12]),
+            new Int32Array([11, 3, 2, 9, 7, 1, 6, 10, 0, 5, 8, 4, 12]),
+            new Int32Array([3, 4, 2, 9, 7, 1, 6, 10, 8, 11, 0, 5, 12]),
+            new Int32Array([3, 4, 2, 9, 7, 1, 6, 10, 8, 11, 0, 5, 12]),
+            new Int32Array([4, 3, 2, 9, 7, 1, 6, 10, 8, 11, 0, 5, 12]),
+            new Int32Array([11, 4, 2, 9, 7, 1, 6, 10, 0, 5, 8, 3, 12]),
+            new Int32Array([11, 2, 9, 7, 1, 6, 10, 0, 5, 8, 4, 3, 12])];
 
         this.npcWalkModel = new Int32Array([0, 1, 2, 1]);
         this.referID = 0;
@@ -2215,7 +2218,7 @@ class mudclient extends GameConnection {
             j2 = i2 * 3 + this.npcCombatModelArray2[((this.loginTimer / 6) | 0) % 8];
         }
 
-        for (let k2 = 0; k2 < 12; k2++) {
+        for (let k2 = 0; k2 < 13; k2++) {
             let l2 = this.npcAnimationArray[l1][k2];
             let l3 = player.equippedItem[l2] - 1;
 

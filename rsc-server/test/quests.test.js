@@ -9,10 +9,17 @@ const { QUESTS, check, questListFor, questState, watchQuestStages, COMPLETE, IN_
 const clientHandlers = require('../../rsc-client/src/packet-handlers/quest-list');
 const clientOpcodes = require('../../rsc-client/src/opcodes/server.json');
 
-test('the list is the stock 50, in the order the client used to hard-code', () => {
-    assert.equal(QUESTS.length, 50);
-    assert.deepEqual(QUESTS[1], { key: 'cooksAssistant', name: "Cook's assistant", members: false });
-    assert.equal(QUESTS.filter((q) => q.members).length, 33);
+// A list of our own, so these tests do not depend on what data/quests.json
+// holds at the moment.
+const SAMPLE = [
+    { key: 'cooksAssistant', name: "Cook's assistant", members: false },
+    { key: 'demonSlayer', name: 'Demon slayer', members: false },
+    { key: 'legendsQuest', name: "Legend's Quest", members: true }
+];
+
+test('data/quests.json is a valid list', () => {
+    assert.ok(QUESTS.length > 0);
+    assert.doesNotThrow(() => check(QUESTS));
 });
 
 test('a stage is not started, started or done', () => {
@@ -20,15 +27,15 @@ test('a stage is not started, started or done', () => {
     assert.equal(questState(0), NOT_STARTED);
     assert.equal(questState(3), IN_PROGRESS);
     assert.equal(questState(-1), COMPLETE);
-    const list = questListFor({ cooksAssistant: -1, demonSlayer: 2 });
-    assert.deepEqual(list.slice(0, 3).map((q) => q.state), [NOT_STARTED, COMPLETE, IN_PROGRESS]);
+    const list = questListFor({ cooksAssistant: -1, demonSlayer: 2 }, SAMPLE);
+    assert.deepEqual(list.map((q) => q.state), [COMPLETE, IN_PROGRESS, NOT_STARTED]);
 });
 
 test('server and client agree on the message, names included', () => {
     assert.equal(serverOpcodes.questList, QUEST_LIST);
     assert.equal(clientOpcodes.QUEST_LIST, QUEST_LIST, 'rsc-client/src/opcodes/server.json uses the same number');
 
-    const quests = questListFor({ cooksAssistant: -1, demonSlayer: 2, legendsQuest: 5 });
+    const quests = questListFor({ cooksAssistant: -1, demonSlayer: 2, legendsQuest: 5 }, SAMPLE);
     const packet = new PacketBuffer(QUEST_LIST, Buffer.alloc(5000));
     serverEncoders.questList(packet, { quests });
     // What the client's handler is given: the opcode, then the body.
