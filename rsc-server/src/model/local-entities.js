@@ -211,23 +211,20 @@ class LocalEntities {
             return;
         }
 
-        const { world } = this.player;
-
+        // Take the updates out as they are sent (splice empties the list and
+        // returns what it held). Upstream sent the lists themselves and
+        // emptied them a tick later -- but a tick runs last tick's scheduled
+        // jobs first, so an appearance pushed by broadcastPlayerAppearance
+        // (a login, a halo) could land and then be emptied before it was
+        // ever sent. The other player then showed as an invisible "null
+        // (level -1)". Taken now, nothing pushed later can be lost.
         this.player.send({
             type: 'regionPlayerUpdate',
-            bubbles: updates.playerBubbles,
-            chats: updates.playerChat,
-            hits: updates.playerHits,
-            projectiles: updates.projectiles,
-            appearances: updates.playerAppearances
-        });
-
-        world.nextTick(() => {
-            updates.playerBubbles.length = 0;
-            updates.playerChat.length = 0;
-            updates.playerAppearances.length = 0;
-            updates.playerHits.length = 0;
-            updates.projectiles.length = 0;
+            bubbles: updates.playerBubbles.splice(0),
+            chats: updates.playerChat.splice(0),
+            hits: updates.playerHits.splice(0),
+            projectiles: updates.projectiles.splice(0),
+            appearances: updates.playerAppearances.splice(0)
         });
     }
 
@@ -259,17 +256,11 @@ class LocalEntities {
             return;
         }
 
-        const { world } = this.player;
-
+        // Taken as sent, for the same reason as sendRegionPlayerUpdate.
         this.player.send({
             type: 'regionNPCUpdate',
-            chats: updates.npcChat,
-            hits: updates.npcHits
-        });
-
-        world.nextTick(() => {
-            updates.npcChat.length = 0;
-            updates.npcHits.length = 0;
+            chats: updates.npcChat.splice(0),
+            hits: updates.npcHits.splice(0)
         });
     }
 
