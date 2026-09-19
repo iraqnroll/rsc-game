@@ -53,9 +53,7 @@ module.exports = {
     [serverOpcodes.PLAYER_STAT_FATIGUE]: function (data) {
         this.statFatigue = Utility.getUnsignedShort(data, 1);
     },
-    [serverOpcodes.PLAYER_QUEST_LIST]: function (data) {
-        for (let i = 0; i < this.questComplete.length; i++) {
-            this.questComplete[i] = !!data[i + 1];
-        }
-    }
+    // Replaced by QUEST_LIST (quest-list.js), which carries the names too.
+    // Kept so a server that still sends this is not a packet error.
+    [serverOpcodes.PLAYER_QUEST_LIST]: function () {}
 };

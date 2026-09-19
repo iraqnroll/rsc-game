@@ -71,63 +71,10 @@ for (let i = 0; i < 99; i++) {
     EXPERIENCE_ARRAY[i] = totalExp & 0xffffffc;
 }
 
-const FREE_QUESTS = [
-    "Black knight's fortress",
-    "Cook's assistant",
-    'Demon slayer',
-    "Doric's quest",
-    'The restless ghost',
-    'Goblin diplomacy',
-    'Ernest the chicken',
-    'Imp catcher',
-    "Pirate's treasure",
-    'Prince Ali rescue',
-    'Romeo & Juliet',
-    'Sheep shearer',
-    'Shield of Arrav',
-    "The knight's sword",
-    'Vampire slayer',
-    "Witch's potion",
-    'Dragon slayer'
-];
-
-const MEMBERS_QUESTS = [
-    "Witch's house",
-    'Lost city',
-    "Hero's quest",
-    'Druidic ritual',
-    "Merlin's crystal",
-    'Scorpion catcher',
-    'Family crest',
-    'Tribal totem',
-    'Fishing contest',
-    "Monk's friend",
-    'Temple of Ikov',
-    'Clock tower',
-    'The Holy Grail',
-    'Fight Arena',
-    'Tree Gnome Village',
-    'The Hazeel Cult',
-    'Sheep Herder',
-    'Plague City',
-    'Sea Slug',
-    'Waterfall quest',
-    'Biohazard',
-    'Jungle potion',
-    'Grand tree',
-    'Shilo village',
-    'Underground pass',
-    'Observatory quest',
-    'Tourist trap',
-    'Watchtower',
-    'Dwarf Cannon',
-    'Murder Mystery',
-    'Digsite',
-    "Gertrude's Cat",
-    "Legend's Quest"
-].map((questName) => `${questName} (members)`);
-
-const QUEST_NAMES = FREE_QUESTS.concat(MEMBERS_QUESTS);
+// The quests and their names come from the server (QUEST_LIST, see
+// packet-handlers/quest-list.js); nothing about them is built into the
+// client, so a quest added on the server shows up here as it is.
+const QUEST_COLOURS = ['@red@', '@yel@', '@gre@']; // not started, started, done
 
 function drawUiTabPlayerInfo(noMenus) {
     let height = 275;
@@ -407,16 +354,18 @@ function drawUiTabPlayerInfo(noMenus) {
         this.panelQuestList.addListEntry(
             this.controlListQuest,
             0,
-            '@whi@Quest-list (green=completed)'
+            '@whi@Green: done   @yel@Yellow: started'
         );
 
-        for (let i = 0; i < QUEST_NAMES.length; i++) {
+        this.questList.forEach((quest, i) => {
             this.panelQuestList.addListEntry(
                 this.controlListQuest,
                 i + 1,
-                (this.questComplete[i] ? '@gre@' : '@red@') + QUEST_NAMES[i]
+                (QUEST_COLOURS[quest.state] || '@red@') +
+                    quest.name +
+                    (quest.members ? ' (members)' : '')
             );
-        }
+        });
 
         this.panelQuestList.drawPanel();
     }

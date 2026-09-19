@@ -8,7 +8,7 @@ const log = require('bole')('player');
 const { MODERATOR, rankName } = require('../ranks');
 const { eventsOf } = require('../admin/events');
 const prayers = require('@2003scape/rsc-data/config/prayers');
-const quests = require('@2003scape/rsc-data/quests');
+const { questListFor, watchQuestStages } = require('../quests');
 const regions = require('@2003scape/rsc-data/regions');
 const { formatSkillName, experienceToLevel } = require('../skills');
 
@@ -105,7 +105,10 @@ class Player extends Character {
 
         this.friends = playerData.friends;
         this.ignores = playerData.ignores;
-        this.questStages = playerData.questStages;
+        // Watched: any stage a quest plugin sets resends the quest list.
+        this.questStages = watchQuestStages(playerData.questStages, () => {
+            if (this.loggedIn) this.sendQuestList();
+        });
         this.cache = playerData.cache;
 
         this.skills = playerData.skills;
@@ -433,13 +436,9 @@ class Player extends Character {
         });
     }
 
+    // Names and states, from src/quests.js; the client has no list of its own.
     sendQuestList() {
-        this.send({
-            type: 'playerQuestList',
-            questCompletion: quests.map((name) => {
-                return this.questStages[name] && this.questStages[name] === -1;
-            })
-        });
+        this.send({ type: 'questList', quests: questListFor(this.questStages) });
     }
 
     // update experience in a single skill

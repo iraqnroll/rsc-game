@@ -38657,7 +38657,7 @@ GameConnection.maxSocialListSize = 100;
 
 module.exports = GameConnection;
 
-},{"./game-shell":235,"./lib/graphics/color":236,"./lib/graphics/font":237,"./opcodes/client":244,"./packet-stream":274,"./utility":309,"long":167,"sleep-promise":209}],233:[function(require,module,exports){
+},{"./game-shell":235,"./lib/graphics/color":236,"./lib/graphics/font":237,"./opcodes/client":244,"./packet-stream":275,"./utility":310,"long":167,"sleep-promise":209}],233:[function(require,module,exports){
 const Utility = require('./utility');
 const ndarray = require('ndarray');
 
@@ -39187,7 +39187,7 @@ GameData.offset = 0;
 
 module.exports = GameData;
 
-},{"./utility":309,"ndarray":173}],234:[function(require,module,exports){
+},{"./utility":310,"ndarray":173}],234:[function(require,module,exports){
 const Utility = require('./utility');
 const Scene = require('./scene');
 
@@ -40472,7 +40472,7 @@ GameModel.base64Alphabet[36] = 63;
 
 module.exports = GameModel;
 
-},{"./scene":278,"./utility":309}],235:[function(require,module,exports){
+},{"./scene":279,"./utility":310}],235:[function(require,module,exports){
 const BZLib = require('./bzlib');
 const Color = require('./lib/graphics/color');
 const Font = require('./lib/graphics/font');
@@ -41383,7 +41383,7 @@ class GameShell {
 
 module.exports = GameShell;
 
-},{"./bzlib":228,"./lib/graphics/color":236,"./lib/graphics/font":237,"./lib/graphics/graphics":238,"./lib/keycodes":239,"./lib/net/socket":241,"./surface":280,"./utility":309,"./version":310,"sleep-promise":209,"tga-js":226}],236:[function(require,module,exports){
+},{"./bzlib":228,"./lib/graphics/color":236,"./lib/graphics/font":237,"./lib/graphics/graphics":238,"./lib/keycodes":239,"./lib/net/socket":241,"./surface":281,"./utility":310,"./version":311,"sleep-promise":209,"tga-js":226}],236:[function(require,module,exports){
 class Color {
     constructor(r, g, b, a = 255) {
         this.r = r;
@@ -42003,7 +42003,6 @@ const GROUND_ITEMS_MAX = 5000;
 const NPCS_SERVER_MAX = 5000;
 const OBJECTS_MAX = 1500;
 const PLAYER_STAT_COUNT = 18;
-const QUEST_COUNT = 50;
 const PLAYER_STAT_EQUIPMENT_COUNT = 5;
 
 const ANIMATED_MODELS = [
@@ -42284,7 +42283,8 @@ class mudclient extends GameConnection {
         this.tradeRecipientItemCount = new Int32Array(14);
         this.showDialogServerMessage = false;
         this.menuType = new Int32Array(MENU_MAX);
-        this.questComplete = new Int8Array(QUEST_COUNT);
+        // Filled by the server's QUEST_LIST: [{ name, members, state }].
+        this.questList = [];
         this.wallObjectModel = [];
         this.wallObjectModel.length = WALL_OBJECTS_MAX;
         this.wallObjectModel.fill(null);
@@ -46642,7 +46642,7 @@ class mudclient extends GameConnection {
 
 module.exports = mudclient;
 
-},{"./game-buffer":230,"./game-character":231,"./game-connection":232,"./game-data":233,"./game-model":234,"./lib/graphics/color":236,"./lib/graphics/font":237,"./lib/keycodes":239,"./opcodes/client":244,"./packet-handlers":251,"./panel":275,"./scene":278,"./stream-audio-player":279,"./surface":280,"./ui":286,"./utility":309,"./version":310,"./word-filter":311,"./world":312,"long":167}],244:[function(require,module,exports){
+},{"./game-buffer":230,"./game-character":231,"./game-connection":232,"./game-data":233,"./game-model":234,"./lib/graphics/color":236,"./lib/graphics/font":237,"./lib/keycodes":239,"./opcodes/client":244,"./packet-handlers":251,"./panel":276,"./scene":279,"./stream-audio-player":280,"./surface":281,"./ui":287,"./utility":310,"./version":311,"./word-filter":312,"./world":313,"long":167}],244:[function(require,module,exports){
 module.exports={
     "APPEARANCE": 235,
     "BANK_CLOSE": 212,
@@ -46785,8 +46785,10 @@ module.exports={
     "TRADE_RECIPIENT_STATUS": 162,
     "TRADE_STATUS": 15,
     "WELCOME": 182,
-    "WORLD_INFO": 25
+    "WORLD_INFO": 25,
+    "QUEST_LIST": 250
 }
+
 },{}],246:[function(require,module,exports){
 const serverOpcodes = require('../opcodes/server');
 
@@ -46863,7 +46865,7 @@ module.exports = {
     }
 };
 
-},{"../opcodes/server":245,"../utility":309}],248:[function(require,module,exports){
+},{"../opcodes/server":245,"../utility":310}],248:[function(require,module,exports){
 const serverOpcodes = require('../opcodes/server');
 
 module.exports = {
@@ -46986,11 +46988,11 @@ module.exports = {
     }
 };
 
-},{"../opcodes/server":245,"../utility":309}],251:[function(require,module,exports){
+},{"../opcodes/server":245,"../utility":310}],251:[function(require,module,exports){
 
 
 function getPacketHandlers(mudclient) {
-    const handlers = (function () {var f = require("./index.js");f["appearance"]=require("./appearance.js");f["bank"]=require("./bank.js");f["close-connection"]=require("./close-connection.js");f["death"]=require("./death.js");f["duel"]=require("./duel.js");f["index"]=require("./index.js");f["inventory"]=require("./inventory.js");f["logout-deny"]=require("./logout-deny.js");f["messages"]=require("./messages.js");f["option-list"]=require("./option-list.js");f["player-stats"]=require("./player-stats.js");f["prayer"]=require("./prayer.js");f["region-entity-update"]=require("./region-entity-update.js");f["region-ground-items"]=require("./region-ground-items.js");f["region-npc-update"]=require("./region-npc-update.js");f["region-npcs"]=require("./region-npcs.js");f["region-objects"]=require("./region-objects.js");f["region-player-update"]=require("./region-player-update.js");f["region-players"]=require("./region-players.js");f["region-wall-objects"]=require("./region-wall-objects.js");f["settings"]=require("./settings.js");f["shop"]=require("./shop.js");f["sleep"]=require("./sleep.js");f["social"]=require("./social.js");f["sound"]=require("./sound.js");f["teleport-bubble"]=require("./teleport-bubble.js");f["trade"]=require("./trade.js");f["world-info"]=require("./world-info.js");return f;})();
+    const handlers = (function () {var f = require("./index.js");f["appearance"]=require("./appearance.js");f["bank"]=require("./bank.js");f["close-connection"]=require("./close-connection.js");f["death"]=require("./death.js");f["duel"]=require("./duel.js");f["index"]=require("./index.js");f["inventory"]=require("./inventory.js");f["logout-deny"]=require("./logout-deny.js");f["messages"]=require("./messages.js");f["option-list"]=require("./option-list.js");f["player-stats"]=require("./player-stats.js");f["prayer"]=require("./prayer.js");f["quest-list"]=require("./quest-list.js");f["region-entity-update"]=require("./region-entity-update.js");f["region-ground-items"]=require("./region-ground-items.js");f["region-npc-update"]=require("./region-npc-update.js");f["region-npcs"]=require("./region-npcs.js");f["region-objects"]=require("./region-objects.js");f["region-player-update"]=require("./region-player-update.js");f["region-players"]=require("./region-players.js");f["region-wall-objects"]=require("./region-wall-objects.js");f["settings"]=require("./settings.js");f["shop"]=require("./shop.js");f["sleep"]=require("./sleep.js");f["social"]=require("./social.js");f["sound"]=require("./sound.js");f["teleport-bubble"]=require("./teleport-bubble.js");f["trade"]=require("./trade.js");f["world-info"]=require("./world-info.js");return f;})();
     const packetMap = {};
 
     for (const [handlerName, handlerMap] of Object.entries(handlers)) {
@@ -47008,7 +47010,7 @@ function getPacketHandlers(mudclient) {
 
 module.exports = getPacketHandlers;
 
-},{"./appearance.js":246,"./bank.js":247,"./close-connection.js":248,"./death.js":249,"./duel.js":250,"./index.js":251,"./inventory.js":252,"./logout-deny.js":253,"./messages.js":254,"./option-list.js":255,"./player-stats.js":256,"./prayer.js":257,"./region-entity-update.js":258,"./region-ground-items.js":259,"./region-npc-update.js":260,"./region-npcs.js":261,"./region-objects.js":262,"./region-player-update.js":263,"./region-players.js":264,"./region-wall-objects.js":265,"./settings.js":266,"./shop.js":267,"./sleep.js":268,"./social.js":269,"./sound.js":270,"./teleport-bubble.js":271,"./trade.js":272,"./world-info.js":273}],252:[function(require,module,exports){
+},{"./appearance.js":246,"./bank.js":247,"./close-connection.js":248,"./death.js":249,"./duel.js":250,"./index.js":251,"./inventory.js":252,"./logout-deny.js":253,"./messages.js":254,"./option-list.js":255,"./player-stats.js":256,"./prayer.js":257,"./quest-list.js":258,"./region-entity-update.js":259,"./region-ground-items.js":260,"./region-npc-update.js":261,"./region-npcs.js":262,"./region-objects.js":263,"./region-player-update.js":264,"./region-players.js":265,"./region-wall-objects.js":266,"./settings.js":267,"./shop.js":268,"./sleep.js":269,"./social.js":270,"./sound.js":271,"./teleport-bubble.js":272,"./trade.js":273,"./world-info.js":274}],252:[function(require,module,exports){
 const GameData = require('../game-data');
 const Utility = require('../utility');
 const serverOpcodes = require('../opcodes/server');
@@ -47086,7 +47088,7 @@ module.exports = {
     }
 };
 
-},{"../game-data":233,"../opcodes/server":245,"../utility":309}],253:[function(require,module,exports){
+},{"../game-data":233,"../opcodes/server":245,"../utility":310}],253:[function(require,module,exports){
 const serverOpcodes = require('../opcodes/server');
 
 module.exports = {
@@ -47138,7 +47140,7 @@ module.exports = {
     }
 };
 
-},{"../opcodes/server":245,"../utility":309}],255:[function(require,module,exports){
+},{"../opcodes/server":245,"../utility":310}],255:[function(require,module,exports){
 const Utility = require('../utility');
 const serverOpcodes = require('../opcodes/server');
 
@@ -47170,7 +47172,7 @@ module.exports = {
     }
 };
 
-},{"../opcodes/server":245,"../utility":309}],256:[function(require,module,exports){
+},{"../opcodes/server":245,"../utility":310}],256:[function(require,module,exports){
 const Utility = require('../utility');
 const serverOpcodes = require('../opcodes/server');
 
@@ -47226,14 +47228,12 @@ module.exports = {
     [serverOpcodes.PLAYER_STAT_FATIGUE]: function (data) {
         this.statFatigue = Utility.getUnsignedShort(data, 1);
     },
-    [serverOpcodes.PLAYER_QUEST_LIST]: function (data) {
-        for (let i = 0; i < this.questComplete.length; i++) {
-            this.questComplete[i] = !!data[i + 1];
-        }
-    }
+    // Replaced by QUEST_LIST (quest-list.js), which carries the names too.
+    // Kept so a server that still sends this is not a packet error.
+    [serverOpcodes.PLAYER_QUEST_LIST]: function () {}
 };
 
-},{"../opcodes/server":245,"../utility":309}],257:[function(require,module,exports){
+},{"../opcodes/server":245,"../utility":310}],257:[function(require,module,exports){
 const serverOpcodes = require('../opcodes/server');
 
 module.exports = {
@@ -47255,6 +47255,36 @@ module.exports = {
 };
 
 },{"../opcodes/server":245}],258:[function(require,module,exports){
+const Utility = require('../utility');
+const serverOpcodes = require('../opcodes/server');
+
+// The quest list with its names, from the server (rsc-server/src/protocol.js):
+//   u16 count, then per quest: u8 state (0 not started, 1 started,
+//   2 complete), u8 flags (bit 0: members), u8 name length, name bytes.
+module.exports = {
+    [serverOpcodes.QUEST_LIST]: function (data) {
+        const count = Utility.getUnsignedShort(data, 1);
+        const quests = [];
+        let offset = 3;
+
+        for (let i = 0; i < count; i++) {
+            const state = data[offset++] & 0xff;
+            const flags = data[offset++] & 0xff;
+            const length = data[offset++] & 0xff;
+            let name = '';
+
+            for (let j = 0; j < length; j++) {
+                name += String.fromCharCode(data[offset++] & 0xff);
+            }
+
+            quests.push({ name, members: (flags & 1) === 1, state });
+        }
+
+        this.questList = quests;
+    }
+};
+
+},{"../opcodes/server":245,"../utility":310}],259:[function(require,module,exports){
 const Utility = require('../utility');
 const serverOpcodes = require('../opcodes/server');
 
@@ -47367,7 +47397,7 @@ module.exports = {
     }
 };
 
-},{"../opcodes/server":245,"../utility":309}],259:[function(require,module,exports){
+},{"../opcodes/server":245,"../utility":310}],260:[function(require,module,exports){
 const GameData = require('../game-data');
 const Utility = require('../utility');
 const serverOpcodes = require('../opcodes/server');
@@ -47469,7 +47499,7 @@ module.exports = {
     }
 };
 
-},{"../game-data":233,"../opcodes/server":245,"../utility":309}],260:[function(require,module,exports){
+},{"../game-data":233,"../opcodes/server":245,"../utility":310}],261:[function(require,module,exports){
 const ChatMessage = require('../chat-message');
 const GameData = require('../game-data');
 const Utility = require('../utility');
@@ -47532,7 +47562,7 @@ module.exports = {
     }
 };
 
-},{"../chat-message":229,"../game-data":233,"../opcodes/server":245,"../utility":309}],261:[function(require,module,exports){
+},{"../chat-message":229,"../game-data":233,"../opcodes/server":245,"../utility":310}],262:[function(require,module,exports){
 const Utility = require('../utility');
 const GameData = require('../game-data');
 const serverOpcodes = require('../opcodes/server');
@@ -47643,7 +47673,7 @@ module.exports = {
     }
 };
 
-},{"../game-data":233,"../opcodes/server":245,"../utility":309}],262:[function(require,module,exports){
+},{"../game-data":233,"../opcodes/server":245,"../utility":310}],263:[function(require,module,exports){
 const Utility = require('../utility');
 const GameData = require('../game-data');
 const serverOpcodes = require('../opcodes/server');
@@ -47778,7 +47808,7 @@ module.exports = {
     }
 };
 
-},{"../game-data":233,"../opcodes/server":245,"../utility":309}],263:[function(require,module,exports){
+},{"../game-data":233,"../opcodes/server":245,"../utility":310}],264:[function(require,module,exports){
 const ChatMessage = require('../chat-message');
 const Utility = require('../utility');
 const WordFilter = require('../word-filter');
@@ -47953,7 +47983,7 @@ module.exports = {
     }
 };
 
-},{"../chat-message":229,"../opcodes/server":245,"../utility":309,"../word-filter":311}],264:[function(require,module,exports){
+},{"../chat-message":229,"../opcodes/server":245,"../utility":310,"../word-filter":312}],265:[function(require,module,exports){
 const Utility = require('../utility');
 const clientOpcodes = require('../opcodes/client');
 const serverOpcodes = require('../opcodes/server');
@@ -48117,7 +48147,7 @@ module.exports = {
     }
 };
 
-},{"../opcodes/client":244,"../opcodes/server":245,"../utility":309}],265:[function(require,module,exports){
+},{"../opcodes/client":244,"../opcodes/server":245,"../utility":310}],266:[function(require,module,exports){
 const Utility = require('../utility');
 const serverOpcodes = require('../opcodes/server');
 
@@ -48233,7 +48263,7 @@ module.exports = {
     }
 };
 
-},{"../opcodes/server":245,"../utility":309}],266:[function(require,module,exports){
+},{"../opcodes/server":245,"../utility":310}],267:[function(require,module,exports){
 const Utility = require('../utility');
 const serverOpcodes = require('../opcodes/server');
 
@@ -48251,7 +48281,7 @@ module.exports = {
     }
 };
 
-},{"../opcodes/server":245,"../utility":309}],267:[function(require,module,exports){
+},{"../opcodes/server":245,"../utility":310}],268:[function(require,module,exports){
 const Utility = require('../utility');
 const serverOpcodes = require('../opcodes/server');
 
@@ -48332,7 +48362,7 @@ module.exports = {
     }
 };
 
-},{"../opcodes/server":245,"../utility":309}],268:[function(require,module,exports){
+},{"../opcodes/server":245,"../utility":310}],269:[function(require,module,exports){
 const Utility = require('../utility');
 const serverOpcodes = require('../opcodes/server');
 
@@ -48359,7 +48389,7 @@ module.exports = {
     }
 };
 
-},{"../opcodes/server":245,"../utility":309}],269:[function(require,module,exports){
+},{"../opcodes/server":245,"../utility":310}],270:[function(require,module,exports){
 const ChatMessage = require('../chat-message');
 const GameConnection = require('../game-connection');
 const Utility = require('../utility');
@@ -48448,7 +48478,7 @@ module.exports = {
     }
 };
 
-},{"../chat-message":229,"../game-connection":232,"../opcodes/server":245,"../utility":309,"../word-filter":311}],270:[function(require,module,exports){
+},{"../chat-message":229,"../game-connection":232,"../opcodes/server":245,"../utility":310,"../word-filter":312}],271:[function(require,module,exports){
 const serverOpcodes = require('../opcodes/server');
 
 function fromCharArray(a) {
@@ -48464,7 +48494,7 @@ module.exports = {
     }
 };
 
-},{"../opcodes/server":245}],271:[function(require,module,exports){
+},{"../opcodes/server":245}],272:[function(require,module,exports){
 const serverOpcodes = require('../opcodes/server');
 
 module.exports = {
@@ -48484,7 +48514,7 @@ module.exports = {
     }
 };
 
-},{"../opcodes/server":245}],272:[function(require,module,exports){
+},{"../opcodes/server":245}],273:[function(require,module,exports){
 const Utility = require('../utility');
 const serverOpcodes = require('../opcodes/server');
 
@@ -48579,7 +48609,7 @@ module.exports = {
     }
 };
 
-},{"../opcodes/server":245,"../utility":309}],273:[function(require,module,exports){
+},{"../opcodes/server":245,"../utility":310}],274:[function(require,module,exports){
 const Utility = require('../utility');
 const serverOpcodes = require('../opcodes/server');
 
@@ -48595,7 +48625,7 @@ module.exports = {
     }
 };
 
-},{"../opcodes/server":245,"../utility":309}],274:[function(require,module,exports){
+},{"../opcodes/server":245,"../utility":310}],275:[function(require,module,exports){
 const Long = require('long');
 
 function toCharArray(s) {
@@ -48882,7 +48912,7 @@ PacketStream.anIntArray541 = new Int32Array(256);
 
 module.exports = PacketStream;
 
-},{"long":167}],275:[function(require,module,exports){
+},{"long":167}],276:[function(require,module,exports){
 const Surface = require('./surface');
 
 const controlTypes = {
@@ -50286,7 +50316,7 @@ Panel.textListEntryHeightMod = 0;
 
 module.exports = Panel;
 
-},{"./surface":280}],276:[function(require,module,exports){
+},{"./surface":281}],277:[function(require,module,exports){
 class Polygon {
     constructor() {
         this.minPlaneX = 0;
@@ -50310,7 +50340,7 @@ class Polygon {
 }
 
 module.exports = Polygon;
-},{}],277:[function(require,module,exports){
+},{}],278:[function(require,module,exports){
 class Scanline {
     constructor() {
         this.startX = 0;
@@ -50321,7 +50351,7 @@ class Scanline {
 }
 
 module.exports = Scanline;
-},{}],278:[function(require,module,exports){
+},{}],279:[function(require,module,exports){
 const Long = require('long');
 const Polygon = require('./polygon');
 const Scanline = require('./scanline');
@@ -55049,7 +55079,7 @@ Scene.textureCountLoaded = new Long(0);
 
 module.exports = Scene;
 
-},{"./polygon":276,"./scanline":277,"long":167}],279:[function(require,module,exports){
+},{"./polygon":277,"./scanline":278,"long":167}],280:[function(require,module,exports){
 const PCMPlayer = require('pcm-player');
 const { mulaw } = require('alawmulaw');
 
@@ -55077,7 +55107,7 @@ class StreamAudioPlayer {
 
 module.exports = StreamAudioPlayer;
 
-},{"alawmulaw":26,"pcm-player":186}],280:[function(require,module,exports){
+},{"alawmulaw":26,"pcm-player":186}],281:[function(require,module,exports){
 const Utility = require('./utility');
 
 const SLEEP_WIDTH = 255;
@@ -58157,7 +58187,7 @@ for (let i = 0; i < 256; i++) {
 
 module.exports = Surface;
 
-},{"./utility":309}],281:[function(require,module,exports){
+},{"./utility":310}],282:[function(require,module,exports){
 module.exports = {
     black : 0,
     white: 0xffffff,
@@ -58176,7 +58206,7 @@ module.exports = {
     chatRed: 0xff3232
 };
 
-},{}],282:[function(require,module,exports){
+},{}],283:[function(require,module,exports){
 const GameData = require('../game-data');
 const Panel = require('../panel');
 const clientOpcodes = require('../opcodes/client');
@@ -58563,7 +58593,7 @@ module.exports = {
     drawAppearancePanelCharacterSprites
 };
 
-},{"../game-data":233,"../opcodes/client":244,"../panel":275}],283:[function(require,module,exports){
+},{"../game-data":233,"../opcodes/client":244,"../panel":276}],284:[function(require,module,exports){
 const GameData = require('../game-data');
 const clientOpcodes = require('../opcodes/client');
 const colours = require('./_colours');
@@ -59301,7 +59331,7 @@ module.exports = {
     drawDialogBank
 };
 
-},{"../game-data":233,"../opcodes/client":244,"./_colours":281}],284:[function(require,module,exports){
+},{"../game-data":233,"../opcodes/client":244,"./_colours":282}],285:[function(require,module,exports){
 const ChatMessage = require('../chat-message');
 const Panel = require('../panel');
 const WordFilter = require('../word-filter');
@@ -59637,7 +59667,7 @@ module.exports = {
     drawChatMessageTabsPanel
 };
 
-},{"../chat-message":229,"../panel":275,"../word-filter":311,"./_colours":281}],285:[function(require,module,exports){
+},{"../chat-message":229,"../panel":276,"../word-filter":312,"./_colours":282}],286:[function(require,module,exports){
 const clientOpcodes = require('../opcodes/client');
 const colours = require('./_colours');
 
@@ -59743,7 +59773,7 @@ module.exports = {
     drawDialogCombatStyle
 };
 
-},{"../opcodes/client":244,"./_colours":281}],286:[function(require,module,exports){
+},{"../opcodes/client":244,"./_colours":282}],287:[function(require,module,exports){
 
 
 function applyUIComponents(mudclient) {
@@ -59766,7 +59796,7 @@ function applyUIComponents(mudclient) {
 
 module.exports = applyUIComponents;
 
-},{"./_colours.js":281,"./appearance-panel.js":282,"./bank-dialog.js":283,"./chat-message-tabs.js":284,"./combat-style.js":285,"./index.js":286,"./inventory-tab.js":287,"./login-panels.js":288,"./logout-dialog.js":289,"./magic-tab.js":290,"./minimap-tab.js":291,"./mobile-ui.js":292,"./option-menu.js":293,"./options-tab.js":294,"./password-dialog.js":295,"./player-info-tab.js":296,"./recovery-panel.js":297,"./report-dialog.js":298,"./server-message-dialog.js":299,"./set-active-ui-tab.js":300,"./shop-dialog.js":301,"./sleep.js":302,"./social-dialog.js":303,"./social-tab.js":304,"./trade-confirm-dialog.js":305,"./trade-dialog.js":306,"./welcome-dialog.js":307,"./wilderness-dialog.js":308}],287:[function(require,module,exports){
+},{"./_colours.js":282,"./appearance-panel.js":283,"./bank-dialog.js":284,"./chat-message-tabs.js":285,"./combat-style.js":286,"./index.js":287,"./inventory-tab.js":288,"./login-panels.js":289,"./logout-dialog.js":290,"./magic-tab.js":291,"./minimap-tab.js":292,"./mobile-ui.js":293,"./option-menu.js":294,"./options-tab.js":295,"./password-dialog.js":296,"./player-info-tab.js":297,"./recovery-panel.js":298,"./report-dialog.js":299,"./server-message-dialog.js":300,"./set-active-ui-tab.js":301,"./shop-dialog.js":302,"./sleep.js":303,"./social-dialog.js":304,"./social-tab.js":305,"./trade-confirm-dialog.js":306,"./trade-dialog.js":307,"./welcome-dialog.js":308,"./wilderness-dialog.js":309}],288:[function(require,module,exports){
 const GameData = require('../game-data');
 const colours = require('./_colours');
 
@@ -59979,7 +60009,7 @@ function drawUiTabInventory(noMenus) {
 
 module.exports = { drawUiTabInventory };
 
-},{"../game-data":233,"./_colours":281}],288:[function(require,module,exports){
+},{"../game-data":233,"./_colours":282}],289:[function(require,module,exports){
 const Panel = require('../panel');
 
 function createLoginPanels() {
@@ -60919,7 +60949,7 @@ module.exports = {
     renderLoginScreenViewports
 };
 
-},{"../panel":275}],289:[function(require,module,exports){
+},{"../panel":276}],290:[function(require,module,exports){
 const colours = require('./_colours');
 
 function drawDialogLogout() {
@@ -60930,7 +60960,7 @@ function drawDialogLogout() {
 
 module.exports = { drawDialogLogout };
 
-},{"./_colours":281}],290:[function(require,module,exports){
+},{"./_colours":282}],291:[function(require,module,exports){
 const GameData = require('../game-data');
 const clientOpcodes = require('../opcodes/client');
 const colours = require('./_colours');
@@ -61254,7 +61284,7 @@ module.exports = {
     uiTabMagicSubTab: 0
 };
 
-},{"../game-data":233,"../opcodes/client":244,"./_colours":281}],291:[function(require,module,exports){
+},{"../game-data":233,"../opcodes/client":244,"./_colours":282}],292:[function(require,module,exports){
 const Scene = require('../scene');
 const colours = require('./_colours');
 
@@ -61514,7 +61544,7 @@ module.exports = {
     drawUiTabMinimap
 };
 
-},{"../scene":278,"./_colours":281}],292:[function(require,module,exports){
+},{"../scene":279,"./_colours":282}],293:[function(require,module,exports){
 const BUTTON_SIZE = 32;
 
 const mobileSprites = {
@@ -61579,7 +61609,7 @@ function drawMobileUI() {
 
 module.exports = { drawMobileUI };
 
-},{}],293:[function(require,module,exports){
+},{}],294:[function(require,module,exports){
 const clientOpcodes = require('../opcodes/client');
 const colours = require('./_colours');
 
@@ -61650,7 +61680,7 @@ function drawOptionMenu() {
 
 module.exports = { drawOptionMenu };
 
-},{"../opcodes/client":244,"./_colours":281}],294:[function(require,module,exports){
+},{"../opcodes/client":244,"./_colours":282}],295:[function(require,module,exports){
 const clientOpcodes = require('../opcodes/client');
 const colours = require('./_colours');
 
@@ -62125,7 +62155,7 @@ function drawUiTabOptions(noMenus) {
 
 module.exports = { drawUiTabOptions };
 
-},{"../opcodes/client":244,"./_colours":281}],295:[function(require,module,exports){
+},{"../opcodes/client":244,"./_colours":282}],296:[function(require,module,exports){
 const colours = require('./_colours');
 
 const DIALOG_X = 106;
@@ -62320,7 +62350,7 @@ module.exports = {
     showChangePasswordStep: 0
 };
 
-},{"./_colours":281}],296:[function(require,module,exports){
+},{"./_colours":282}],297:[function(require,module,exports){
 const colours = require('./_colours');
 
 const MENU_WIDTH = 245;
@@ -62394,63 +62424,10 @@ for (let i = 0; i < 99; i++) {
     EXPERIENCE_ARRAY[i] = totalExp & 0xffffffc;
 }
 
-const FREE_QUESTS = [
-    "Black knight's fortress",
-    "Cook's assistant",
-    'Demon slayer',
-    "Doric's quest",
-    'The restless ghost',
-    'Goblin diplomacy',
-    'Ernest the chicken',
-    'Imp catcher',
-    "Pirate's treasure",
-    'Prince Ali rescue',
-    'Romeo & Juliet',
-    'Sheep shearer',
-    'Shield of Arrav',
-    "The knight's sword",
-    'Vampire slayer',
-    "Witch's potion",
-    'Dragon slayer'
-];
-
-const MEMBERS_QUESTS = [
-    "Witch's house",
-    'Lost city',
-    "Hero's quest",
-    'Druidic ritual',
-    "Merlin's crystal",
-    'Scorpion catcher',
-    'Family crest',
-    'Tribal totem',
-    'Fishing contest',
-    "Monk's friend",
-    'Temple of Ikov',
-    'Clock tower',
-    'The Holy Grail',
-    'Fight Arena',
-    'Tree Gnome Village',
-    'The Hazeel Cult',
-    'Sheep Herder',
-    'Plague City',
-    'Sea Slug',
-    'Waterfall quest',
-    'Biohazard',
-    'Jungle potion',
-    'Grand tree',
-    'Shilo village',
-    'Underground pass',
-    'Observatory quest',
-    'Tourist trap',
-    'Watchtower',
-    'Dwarf Cannon',
-    'Murder Mystery',
-    'Digsite',
-    "Gertrude's Cat",
-    "Legend's Quest"
-].map((questName) => `${questName} (members)`);
-
-const QUEST_NAMES = FREE_QUESTS.concat(MEMBERS_QUESTS);
+// The quests and their names come from the server (QUEST_LIST, see
+// packet-handlers/quest-list.js); nothing about them is built into the
+// client, so a quest added on the server shows up here as it is.
+const QUEST_COLOURS = ['@red@', '@yel@', '@gre@']; // not started, started, done
 
 function drawUiTabPlayerInfo(noMenus) {
     let height = 275;
@@ -62730,16 +62707,18 @@ function drawUiTabPlayerInfo(noMenus) {
         this.panelQuestList.addListEntry(
             this.controlListQuest,
             0,
-            '@whi@Quest-list (green=completed)'
+            '@whi@Green: done   @yel@Yellow: started'
         );
 
-        for (let i = 0; i < QUEST_NAMES.length; i++) {
+        this.questList.forEach((quest, i) => {
             this.panelQuestList.addListEntry(
                 this.controlListQuest,
                 i + 1,
-                (this.questComplete[i] ? '@gre@' : '@red@') + QUEST_NAMES[i]
+                (QUEST_COLOURS[quest.state] || '@red@') +
+                    quest.name +
+                    (quest.members ? ' (members)' : '')
             );
-        }
+        });
 
         this.panelQuestList.drawPanel();
     }
@@ -62779,7 +62758,7 @@ module.exports = {
     uiTabPlayerInfoSubTab: 0
 };
 
-},{"./_colours":281}],297:[function(require,module,exports){
+},{"./_colours":282}],298:[function(require,module,exports){
 const selectedRecoverQuestions = [];
 selectedRecoverQuestions.length = 5;
 selectedRecoverQuestions.fill(null);
@@ -62794,7 +62773,7 @@ module.exports = {
     controlRecoverCreateButton: 0
 };
 
-},{}],298:[function(require,module,exports){
+},{}],299:[function(require,module,exports){
 const Utility = require('../utility');
 const clientOpcodes = require('../opcodes/client');
 const colours = require('./_colours');
@@ -63102,7 +63081,7 @@ module.exports = {
     showDialogReportAbuseStep: 0
 };
 
-},{"../opcodes/client":244,"../utility":309,"./_colours":281}],299:[function(require,module,exports){
+},{"../opcodes/client":244,"../utility":310,"./_colours":282}],300:[function(require,module,exports){
 const colours = require('./_colours');
 
 const WIDTH = 400;
@@ -63183,7 +63162,7 @@ module.exports = {
     drawDialogServerMessage
 };
 
-},{"./_colours":281}],300:[function(require,module,exports){
+},{"./_colours":282}],301:[function(require,module,exports){
 const BUTTON_SIZE = 32;
 
 function setActiveUITab() {
@@ -63388,7 +63367,7 @@ function setActiveMobileUITab() {
 
 module.exports = { setActiveUITab, setActiveMobileUITab };
 
-},{}],301:[function(require,module,exports){
+},{}],302:[function(require,module,exports){
 const GameData = require('../game-data');
 const clientOpcodes = require('../opcodes/client');
 const colours = require('./_colours');
@@ -63768,7 +63747,7 @@ function drawDialogShop() {
 
 module.exports = { drawDialogShop };
 
-},{"../game-data":233,"../opcodes/client":244,"./_colours":281}],302:[function(require,module,exports){
+},{"../game-data":233,"../opcodes/client":244,"./_colours":282}],303:[function(require,module,exports){
 const clientOpcodes = require('../opcodes/client');
 const colours = require('./_colours');
 
@@ -63944,7 +63923,7 @@ module.exports = {
     isSleeping: false
 };
 
-},{"../opcodes/client":244,"./_colours":281}],303:[function(require,module,exports){
+},{"../opcodes/client":244,"./_colours":282}],304:[function(require,module,exports){
 // dialog boxes for private messaging and ignore lists
 
 const ChatMessage = require('../chat-message');
@@ -64158,7 +64137,7 @@ module.exports = {
     showDialogSocialInput: 0
 };
 
-},{"../chat-message":229,"../utility":309,"../word-filter":311,"./_colours":281}],304:[function(require,module,exports){
+},{"../chat-message":229,"../utility":310,"../word-filter":312,"./_colours":282}],305:[function(require,module,exports){
 const Utility = require('../utility');
 const colours = require('./_colours');
 
@@ -64466,7 +64445,7 @@ module.exports = {
     uiTabSocialSubTab: 0
 };
 
-},{"../utility":309,"./_colours":281}],305:[function(require,module,exports){
+},{"../utility":310,"./_colours":282}],306:[function(require,module,exports){
 const GameData = require('../game-data');
 const Utility = require('../utility');
 const clientOpcodes = require('../opcodes/client');
@@ -64659,7 +64638,7 @@ module.exports = {
     showDialogTradeConfirm: false
 };
 
-},{"../game-data":233,"../opcodes/client":244,"../utility":309,"./_colours":281}],306:[function(require,module,exports){
+},{"../game-data":233,"../opcodes/client":244,"../utility":310,"./_colours":282}],307:[function(require,module,exports){
 const GameData = require('../game-data');
 const clientOpcodes = require('../opcodes/client');
 const colours = require('./_colours');
@@ -65177,7 +65156,7 @@ module.exports = {
     showDialogTrade: false
 };
 
-},{"../game-data":233,"../opcodes/client":244,"./_colours":281}],307:[function(require,module,exports){
+},{"../game-data":233,"../opcodes/client":244,"./_colours":282}],308:[function(require,module,exports){
 const colours = require('./_colours');
 
 const WIDTH = 400;
@@ -65426,7 +65405,7 @@ module.exports = {
     showDialogWelcome: false
 };
 
-},{"./_colours":281}],308:[function(require,module,exports){
+},{"./_colours":282}],309:[function(require,module,exports){
 const colours = require('./_colours');
 
 function drawDialogWildWarn() {
@@ -65562,7 +65541,7 @@ module.exports = {
     drawDialogWildWarn
 };
 
-},{"./_colours":281}],309:[function(require,module,exports){
+},{"./_colours":282}],310:[function(require,module,exports){
 const BZLib = require('./bzlib');
 const FileDownloadStream = require('./lib/net/file-download-stream');
 const Long = require('long');
@@ -65955,7 +65934,7 @@ Utility.bitmask = new Int32Array([
 
 module.exports = Utility;
 
-},{"./bzlib":228,"./lib/net/file-download-stream":240,"long":167}],310:[function(require,module,exports){
+},{"./bzlib":228,"./lib/net/file-download-stream":240,"long":167}],311:[function(require,module,exports){
 module.exports={
     "CLIENT": 204,
     "CONFIG": 85,
@@ -65969,7 +65948,7 @@ module.exports={
     "TEXTURES": 17
 }
 
-},{}],311:[function(require,module,exports){
+},{}],312:[function(require,module,exports){
 const C_0 = '0'.charCodeAt(0);
 const C_9 = '9'.charCodeAt(0);
 const C_A = 'a'.charCodeAt(0);
@@ -67135,7 +67114,7 @@ WordFilter.ignoreList = ['cook', "cook's", 'cooks', 'seeks', 'sheet'];
 
 module.exports = WordFilter;
 
-},{}],312:[function(require,module,exports){
+},{}],313:[function(require,module,exports){
 const GameData = require('./game-data');
 const Scene = require('./scene');
 const GameModel = require('./game-model');
@@ -69635,4 +69614,4 @@ World.colourTransparent = 12345678;
 
 module.exports = World;
 
-},{"./game-data":233,"./game-model":234,"./scene":278,"./utility":309,"ndarray":173}]},{},[1]);
+},{"./game-data":233,"./game-model":234,"./scene":279,"./utility":310,"ndarray":173}]},{},[1]);

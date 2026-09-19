@@ -35,7 +35,6 @@ const GROUND_ITEMS_MAX = 5000;
 const NPCS_SERVER_MAX = 5000;
 const OBJECTS_MAX = 1500;
 const PLAYER_STAT_COUNT = 18;
-const QUEST_COUNT = 50;
 const PLAYER_STAT_EQUIPMENT_COUNT = 5;
 
 const ANIMATED_MODELS = [
@@ -316,7 +315,8 @@ class mudclient extends GameConnection {
         this.tradeRecipientItemCount = new Int32Array(14);
         this.showDialogServerMessage = false;
         this.menuType = new Int32Array(MENU_MAX);
-        this.questComplete = new Int8Array(QUEST_COUNT);
+        // Filled by the server's QUEST_LIST: [{ name, members, state }].
+        this.questList = [];
         this.wallObjectModel = [];
         this.wallObjectModel.length = WALL_OBJECTS_MAX;
         this.wallObjectModel.fill(null);

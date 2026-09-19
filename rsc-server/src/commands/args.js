@@ -9,10 +9,12 @@
 const items = require('@2003scape/rsc-data/config/items');
 const npcs = require('@2003scape/rsc-data/config/npcs');
 const objects = require('@2003scape/rsc-data/config/objects');
-const quests = require('@2003scape/rsc-data/quests');
 const regions = require('@2003scape/rsc-data/regions');
 const shops = require('@2003scape/rsc-data/shops');
 const skillNames = require('@2003scape/rsc-data/skill-names');
+const { QUESTS } = require('../quests');
+
+const quests = QUESTS.map((q) => q.key);
 
 const ENTITY_LISTS = ['players', 'npcs', 'gameObjects', 'wallObjects', 'groundItems'];
 
@@ -119,7 +121,7 @@ const FINDABLE = {
     item: () => items,
     npc: () => npcs,
     object: () => objects,
-    quest: () => quests,
+    quest: () => QUESTS.map((q) => `${q.name} -- ${q.key}`),
     region: () => Object.keys(regions),
     shop: () => Object.keys(shops)
 };

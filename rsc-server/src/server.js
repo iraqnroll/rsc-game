@@ -1,5 +1,8 @@
 const BrowserSocket = require('./browser-socket');
 
+// Before any socket is made: registers this game's own messages.
+require('./protocol');
+
 const DataClient = process.browser
     ? require('./browser-data-client')
     : require('./data-client');

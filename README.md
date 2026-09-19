@@ -61,6 +61,26 @@ The table lives in `rsc-server/src/commands/index.js`; every command there
 states its rank, arguments, help line and an example. Every attempt, allowed
 or not, is logged.
 
+## Adding a quest
+
+The quest list lives in `rsc-server/data/quests.json`, and only there: the
+server sends it to the client at login (and whenever a quest moves on), so
+the client has no list of its own. Add an entry:
+
+```json
+{ "key": "kosmolitsQuest", "name": "Kosmolit's quest", "members": false }
+```
+
+- `key` is what the quest's plugin uses in `player.questStages` -- a stage
+  number, `-1` when it is done. Do not rename it once players have progress.
+- `name` is shown as written: plain ASCII, up to 80 characters.
+- The list's place in the file is its place in the quest tab.
+
+In the tab, red is not started, yellow is started (any stage above 0), green
+is done. `::setquest <key> <stage>` sets a stage while testing, and
+`::find quest <text>` looks keys up. The quest's behaviour -- dialogue,
+stages, rewards -- is a plugin, like the ones in `rsc-server/src/plugins/quests`.
+
 ## On the server
 
 RSC Editor's `deploy/game/install.sh` clones this repository to
