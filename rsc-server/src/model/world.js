@@ -10,6 +10,7 @@ const tiles = require('@2003scape/rsc-data/config/tiles');
 const wallObjects = require('@2003scape/rsc-data/config/wall-objects');
 const { Landscape } = require('@2003scape/rsc-landscape');
 const { PathFinder } = require('@2003scape/rsc-path-finder');
+const { pathfindingLandscape } = require('./pathfinding-landscape');
 
 const entityLocations = {
     npcs: require('@2003scape/rsc-data/locations/npcs'),
@@ -138,9 +139,10 @@ class World {
 
         this.landscape.parseArchives();
 
+        // Not the landscape itself: see pathfinding-landscape.js for why.
         this.pathFinder = new PathFinder(
             { objects, wallObjects, tiles },
-            this.landscape
+            pathfindingLandscape(this.landscape)
         );
     }
 
