@@ -111,7 +111,7 @@ async function lastStageStarted(player, ivan) {
             await ivan.say(
                 "Fetch me 3 potatoes and 3 cabbages from the sacks in the backyard",
                 "you can find it to the east of the house",
-                "you can access it by examining the bookcase to the right"
+                "you can access it by searching the bookcase to the right"
             );
             break;
         case ENOUGH:

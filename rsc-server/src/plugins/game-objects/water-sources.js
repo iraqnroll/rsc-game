@@ -7,11 +7,14 @@ const WELL_IDS = new Set([2, 466, 814]);
 async function onUseWithGameObject(player, gameObject, item) {
     const refilledID = Item.getFullWater(item.id);
 
-    if (
-        typeof refilledID === 'undefined' ||
-        (WELL_IDS.has(gameObject.id) && item.id !== BUCKET_ID) &&
-        !SOURCE_IDS.has(gameObject.id)
-    ) {
+    // && binds tighter than ||, so the old single condition only bailed out
+    // for a well used with something other than a bucket: every other object
+    // in the game filled a bucket with water, including ones a quest wanted
+    // to handle itself.
+    const isSource = SOURCE_IDS.has(gameObject.id);
+    const isWell = WELL_IDS.has(gameObject.id) && item.id === BUCKET_ID;
+
+    if (typeof refilledID === 'undefined' || (!isSource && !isWell)) {
         return false;
     }
 
