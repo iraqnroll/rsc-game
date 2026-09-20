@@ -12,6 +12,14 @@ const deltaDirections = [
     [directions.southEast, directions.east, directions.northEast]
 ];
 
+// How long a line of dialogue stays overhead before the next one replaces it.
+// The client wraps the bubble at 300px (Surface#drawParagraph), so a long line
+// is two or three rows to read rather than one; a flat delay gave a
+// seventy-character line the same moment on screen as "Hello". Base plus one
+// tick per so many characters, at 640ms a tick.
+const SAY_BASE_TICKS = 3;
+const SAY_CHARS_PER_TICK = 15;
+
 // [ { deltaX: 0, deltaY: 1 }, ... ]
 const numberDirections = [];
 
@@ -85,11 +93,11 @@ class Character extends Entity {
     async say(...messages) {
         for (const message of messages) {
             this.broadcastChat(message, true);
-            await this.world.sleepTicks(2);
 
-            if (message.length >= 25) {
-                await this.world.sleepTicks(1);
-            }
+            await this.world.sleepTicks(
+                SAY_BASE_TICKS +
+                    Math.floor(message.length / SAY_CHARS_PER_TICK)
+            );
         }
     }
 
