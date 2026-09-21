@@ -37,6 +37,45 @@ const QUEST_STAGE_ERRAND3 = 3;
 const QUEST_STAGE_FINAL = 4;
 const QUEST_COMPLETE = -1;
 
+// Ivan cannot take a compliment or give one. Every finished errand sets him
+// off on whoever he blames for the job existing in the first place; the player
+// is only ever an audience.
+async function treeRant(player, ivan) {
+    await ivan.say(
+        "You know who planted those trees ? Old Alexander",
+        "The groundskeeper before me, dead for over ten years, still ruining my week",
+        "'They'll give the place some character, Ivan' he said...",
+        "Character...",
+        "They even tried to eat a funeral congregation once !",
+        "I go to his grave every spring just to tell him what I think of him",
+        "...anyway. Well done, I suppose"
+    );
+}
+
+async function gravestoneRant(player, ivan) {
+    await ivan.say(
+        "See, this is what I tell the mourners",
+        "They turn up with their lilies and their sniffling",
+        "and not one of them has ever brought a brush",
+        "maybe they think the graveyard cleans itself...",
+        "...one widow even had the nerve to call the place unkempt",
+        "Unkempt ! Her husband's the one leaking into my floor from outside",
+        "I hope she's listening. She's over there as well, right next to him"
+    );
+}
+
+async function vegetableRant(player, ivan) {
+    await ivan.say(
+        "Grew those myself. Had to, after the business with the grocer",
+        "Fifteen years I bought his cabbages. Fifteen !",
+        "Then he says my money smells of graveyard",
+        "So I told him exactly where his stock ends up...",
+        "...in the ground, same as everyone, and I'd be waiting...",
+        "He crossed the road to avoid me until the day he moved in",
+        "That big gravestone in the graveyard. I give him a wave every morning"
+    );
+}
+
 // Ivan is done handing out errands, and the player is off looking for the note
 // and the key. He has nothing left to offer either way.
 async function deadEnd(player, ivan) {
@@ -84,6 +123,8 @@ async function lastStage(player, ivan) {
                 "Well, well... you actually managed it",
                 "That'll do for tonight's stew"
             );
+
+            await vegetableRant(player, ivan);
 
             player.message("@que@I am sick and tired of this guy...");
             await world.sleepTicks(2);
@@ -144,8 +185,10 @@ async function secondStage(player, ivan) {
             "Clean those gravestones, and make them shiny"
         );
     } else {
+        await ivan.say("Wow, you really did scrub them, good job");
+        await gravestoneRant(player, ivan);
+
         await ivan.say(
-            "Wow, you really did scrub them, good job",
             "...hmm...what else do I need...",
             "Well, I do need to get some food from the backyard...",
             "But it's too cold outside, you do it!"
@@ -160,8 +203,7 @@ async function secondStage(player, ivan) {
 
 async function secondStageStarted(player, ivan) {
     await ivan.say(
-        "Well, good job I guess",
-        "but you're not done yet, the gravestones are dirty and mossy",
+        "You're not done yet though, the gravestones are dirty and mossy",
         "I need them washed and scrubbed"
     );
 
@@ -222,6 +264,7 @@ async function firstStage(player, ivan) {
     if (choice === CHOPPED_TREES) {
         if (felled.length === EVIL_TREES.size) { // all four
             await ivan.say("Well I'll be damned... they're really gone");
+            await treeRant(player, ivan);
             // done: move the quest on and clean up
             player.questStages.groundskeepingTroubles = QUEST_STAGE_ERRAND2;
             delete player.cache.evilTreesCut;
@@ -231,7 +274,9 @@ async function firstStage(player, ivan) {
         } else {
             await ivan.say(
                 "Don't lie to me, I can see them from here",
-                `You've only dealt with ${felled.length} of them`
+                felled.length === 0
+                    ? "You haven't laid a finger on a single one"
+                    : `You've only dealt with ${felled.length} of them`
             );
         }
     } else if (choice === TREES_ATTACKED) {
@@ -266,7 +311,7 @@ async function preQuestStart(player, ivan) {
             await ivan.say(
                 "Sorry to say this, but you're probably dead !",
                 "For years now this graveyard has been getting visitors from the beyond",
-                "and it's always the same story - woke up in the graveyard, doesn't remember a thing",
+                "and it's always the same story - woke up in the graveyard with no memory",
                 "I have a feeling Kosmolit is behind all of this, not sure how..."
             );
 
@@ -284,7 +329,7 @@ async function preQuestStart(player, ivan) {
                 "Well... I heard of one way...",
                 "Rumours have it that you have to find your soul",
                 "Take my words with a grain of salt though, I'm not an expert on this",
-                "so either do that or stay in this graveyard, I don't really care...",
+                "either do that or stay in this graveyard, I don't really care...",
                 "...as long as you leave me alone and stay out of my way..."
             );
 

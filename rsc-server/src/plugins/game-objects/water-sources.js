@@ -1,7 +1,9 @@
 const Item = require('../../model/item');
 
 const BUCKET_ID = 21;
-const SOURCE_IDS = new Set([26, 48, 86, 1130]);
+// 1189 is the graveyard fountain, the only water in Bucktooth Ridge -- the
+// gravestones of Groundskeeping Troubles need a bucket of it.
+const SOURCE_IDS = new Set([26, 48, 86, 1130, 1189]);
 const WELL_IDS = new Set([2, 466, 814]);
 
 async function onUseWithGameObject(player, gameObject, item) {

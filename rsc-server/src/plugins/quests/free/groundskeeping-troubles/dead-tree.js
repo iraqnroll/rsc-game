@@ -98,7 +98,13 @@ async function onUseWithGameObject(player, gameObject, item) {
     const left = EVIL_TREES.size - player.cache.evilTreesCut.length;
     await world.sleepTicks(1);
 
-    player.message(`@que@ Only ${left} more to go...`);
+    if (left === 0) {
+        player.message('@que@That was the last of them...');
+    } else if (left === 1) {
+        player.message('@que@Only one more to go...');
+    } else {
+        player.message(`@que@Only ${left} more to go...`);
+    }
 
     return true;
 }
