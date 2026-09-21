@@ -2,6 +2,17 @@ const GATE_ID = 1198;
 const GATE_KEY = 1292;
 
 const QUEST_STAGE_FINAL = 5;
+
+// The trees, the soup, the pond, and the ghosts by the gravestones.
+const REWARDED_SKILLS = [
+    'woodcutting',
+    'cooking',
+    'fishing',
+    'attack',
+    'defense',
+    'strength',
+    'hits'
+];
 const QUEST_COMPLETE = -1;
 
 const DESTINATION_X = 113;
@@ -76,11 +87,12 @@ async function onUseWithGameObject(player, gameObject, item) {
         player.addQuestPoints(1);
         player.message('@gre@You haved gained 1 quest points!');
 
-        player.addExperience(
-            'woodcutting',
-            player.skills.woodcutting.base * 60 + 500,
-            false
-        );
+        // Every skill the quest actually made them use, plus the combat
+        // skills for the ghosts. Each is worked out from ITS OWN base, so the
+        // reward keeps its shape whatever the player already had.
+        for (const skill of REWARDED_SKILLS) {
+            player.addExperience(skill, player.skills[skill].base * 60 + 500, false);
+        }
     }
 
     return true;
