@@ -236,6 +236,7 @@ class Server {
 
             await this.world.loadData();
             this.world.tick();
+            this.world.startAutosave();
 
             this.loadPacketHandlers();
 

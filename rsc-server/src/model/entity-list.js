@@ -37,6 +37,12 @@ class EntityList {
         return index;
     }
 
+    // whether this very instance is still in the list -- index alone is not
+    // enough, since a removed entity's slot gets reused
+    has(entity) {
+        return this.entities[entity.index] === entity;
+    }
+
     remove(entity) {
         // make sure this is the same entity that was here before, in case
         // we try to remove the same instance twice.

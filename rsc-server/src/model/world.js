@@ -378,8 +378,12 @@ class World {
             this.setTimeout(() => delete groundItem.owner, DROP_OWNER_TIMEOUT);
         }
 
+        // By now it may have been picked up, lit, or taken by a plugin. Removing
+        // it again throws, and in a bare timer that took the whole server down.
         this.setTimeout(() => {
-            this.removeEntity('groundItems', groundItem);
+            if (this.groundItems.has(groundItem)) {
+                this.removeEntity('groundItems', groundItem);
+            }
         }, DROP_DISAPPEAR_TIMEOUT);
 
         this.addEntity('groundItems', groundItem);
@@ -508,8 +512,15 @@ class World {
         setTimeout(this.boundTick, TICK_INTERVAL - deltaTime);
     }
 
+    startAutosave() {
+        setTimeout(this.boundSaveAllPlayers, PLAYER_SAVE_INTERVAL);
+    }
+
+    // Runs every PLAYER_SAVE_INTERVAL from startup. Without it players were
+    // only saved at logout, so a crash lost everything since they logged in.
     async saveAllPlayers() {
         if (!this.players.length) {
+            setTimeout(this.boundSaveAllPlayers, PLAYER_SAVE_INTERVAL);
             return;
         }
 
@@ -517,7 +528,11 @@ class World {
         log.info('saving all players...');
 
         for (const player of this.players.getAll()) {
-            await player.save();
+            try {
+                await player.save();
+            } catch (e) {
+                log.error(e);
+            }
         }
 
         const deltaTime = Date.now() - startTime;
