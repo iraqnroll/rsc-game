@@ -23,6 +23,21 @@ function experienceToLevel(experience) {
     return level;
 }
 
+// Levels aren't saved -- they come back from experience when a player logs
+// in. A drained skill restores on its own, but one saved without a current
+// level at all never would, so it comes back at its own level.
+function loadSkillLevels(skills) {
+    for (const skill of Object.values(skills)) {
+        skill.base = experienceToLevel(skill.experience);
+
+        if (!Number.isFinite(skill.current)) {
+            skill.current = skill.base;
+        }
+    }
+
+    return skills;
+}
+
 function formatSkillName(skill) {
     if (skill === 'woodcutting') {
         return 'Woodcut';
@@ -35,4 +50,4 @@ function formatSkillName(skill) {
     return skill.slice(0, 1).toUpperCase() + skill.slice(1, skill.length);
 }
 
-module.exports = { experienceToLevel, formatSkillName };
+module.exports = { experienceToLevel, formatSkillName, loadSkillLevels };

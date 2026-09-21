@@ -11,7 +11,11 @@ const prayers = require('@2003scape/rsc-data/config/prayers');
 const { questListFor, watchQuestStages } = require('../quests');
 const { HALO_LAYER, haloLayerValue } = require('../halo');
 const regions = require('@2003scape/rsc-data/regions');
-const { formatSkillName, experienceToLevel } = require('../skills');
+const {
+    formatSkillName,
+    experienceToLevel,
+    loadSkillLevels
+} = require('../skills');
 
 const {
     rollPlayerNPCDamage,
@@ -114,11 +118,7 @@ class Player extends Character {
 
         this.skills = playerData.skills;
 
-        for (const skillName of Object.keys(this.skills)) {
-            this.skills[skillName].base = experienceToLevel(
-                this.skills[skillName].experience
-            );
-        }
+        loadSkillLevels(this.skills);
 
         this.combatLevel = this.getCombatLevel();
 
@@ -1534,19 +1534,26 @@ class Player extends Character {
     async save() {
         let message = { handler: 'playerUpdate' };
 
+        // Inventory and Bank serialize through toJSON, friends and ignores
+        // are arrays and questStages is watched, so they go as they are.
         for (const property of SAVE_PROPERTIES) {
-            if (typeof this.property === 'object') {
-                message[property] = { ...this[property] };
-            } else {
-                message[property] = this[property];
-            }
+            message[property] = this[property];
         }
 
         message = { ...message, ...this.appearance };
 
-        for (const skillName of Object.keys(message.skills)) {
-            delete message.skills[skillName].base;
-        }
+        // base comes back from experience on login, so it isn't saved. The
+        // skills are copied rather than stripped: deleting base off the live
+        // ones left every level comparison after a save looking at undefined,
+        // and the next level-up setting current to NaN.
+        message.skills = Object.fromEntries(
+            Object.entries(this.skills).map(
+                ([skillName, { current, experience }]) => [
+                    skillName,
+                    { current, experience }
+                ]
+            )
+        );
 
         await this.world.server.dataClient.sendAndReceive(message);
     }
