@@ -1,7 +1,7 @@
 const GATE_ID = 1198;
 const GATE_KEY = 1292;
 
-const QUEST_STAGE_FINAL = 4;
+const QUEST_STAGE_FINAL = 5;
 const QUEST_COMPLETE = -1;
 
 const DESTINATION_X = 113;

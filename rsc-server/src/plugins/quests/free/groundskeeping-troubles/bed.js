@@ -1,6 +1,6 @@
 const BED_ID = 1199;
 const GATE_KEY = 1292;
-const QUEST_STAGE = 4;
+const QUEST_STAGE = 5;
 const QUEST_COMPLETE = -1;
 
 async function onGameObjectCommandTwo(player, gameObject) {
@@ -30,6 +30,8 @@ async function onGameObjectCommandTwo(player, gameObject) {
         return true;
     }
 
+    // He was insufferable about being watched right up until the soup.
+    player.message('@que@...Ivan is bent over his bowl and does not look up');
     player.message('@que@...you find a brass key under the bed');
     player.inventory.add(GATE_KEY);
 

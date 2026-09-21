@@ -1,5 +1,7 @@
 const EVIL_TREES = new Set([1190, 1191, 1192, 1193]);
 const BUCKET_OF_SALT = 1290;
+const EMPTY_BUCKET = 21;
+const EVIL_LOGS = 1293;
 const TREESTUMP = 4;
 const TREE_RESPAWN = 60 * 1000; // ms until the evil tree grows back
 
@@ -63,6 +65,7 @@ async function onUseWithGameObject(player, gameObject, item) {
     }
 
     player.inventory.remove(BUCKET_OF_SALT);
+    player.inventory.add(EMPTY_BUCKET);
     player.message("@que@The tree squirms and calms down");
 
     if (axeID === undefined) {
@@ -87,6 +90,7 @@ async function onUseWithGameObject(player, gameObject, item) {
     world.setTimeout(() => world.replaceEntity("gameObjects", stump, treeID), TREE_RESPAWN);
 
     player.message("@que@The evil tree crashes to the ground");
+    player.inventory.add(EVIL_LOGS);
 
     // Which evil trees this player has felled, by id -- each of the four has
     // its own, so a tree cut twice counts once.
@@ -109,4 +113,4 @@ async function onUseWithGameObject(player, gameObject, item) {
     return true;
 }
 
-module.exports = { onGameObjectCommandOne, onGameObjectCommandTwo, onUseWithGameObject, EVIL_TREES };
+module.exports = { onGameObjectCommandOne, onGameObjectCommandTwo, onUseWithGameObject, EVIL_TREES, EVIL_LOGS };
