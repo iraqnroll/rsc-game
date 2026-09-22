@@ -15,8 +15,10 @@ const QUEST_COMPLETE = -1;
 
 // how far the ghost wanders from the grave it rose out of
 const GHOST_RANGE = 4;
-// ticks until an unbeaten ghost sinks back into its grave
-const GHOST_TICKS = 132;
+// ticks (~5 minutes) until an unbeaten ghost sinks back into its grave
+const GHOST_TICKS = 470;
+// a ghost mid-fight when its time is up gets this much longer, again and again
+const GHOST_FIGHT_TICKS = 16;
 // the note turns up on one of the first this-many ghosts the player puts down
 const MAX_GHOSTS_FOR_NOTE = 3;
 
@@ -71,15 +73,22 @@ async function raiseGhost(player, gravestone) {
     delete ghost.respawn;
     ghostOwners.set(ghost, player.id);
 
-    world.setTickTimeout(() => {
+    const sink = () => {
         if (!ghostOwners.has(ghost)) {
+            return;
+        }
+
+        if (ghost.opponent) {
+            world.setTickTimeout(sink, GHOST_FIGHT_TICKS);
             return;
         }
 
         ghostOwners.delete(ghost);
         ghost.retreat();
         world.removeEntity('npcs', ghost);
-    }, GHOST_TICKS);
+    };
+
+    world.setTickTimeout(sink, GHOST_TICKS);
 
     world.addEntity('npcs', ghost);
 
