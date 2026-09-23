@@ -2,7 +2,11 @@
 const { axes } = require('@2003scape/rsc-data/skills/woodcutting');
 const { EVIL_TREES } = require('./dead-tree');
 const { BOWL_ID, SHRIMP_SOUP_ID } = require('./soup');
-const { GRAVESTONES_CLEANED_REQUIRED } = require('./gravestone');
+const {
+    cleanedGravestoneCount,
+    forgetCleanedGravestones,
+    GRAVESTONES_CLEANED_REQUIRED
+} = require('./gravestone');
 
 const IVAN_ID = 5;
 const BRONZE_AXE_ID = 87;
@@ -363,10 +367,9 @@ async function handCleaningKit(player, ivan) {
 
 async function secondStage(player, ivan) {
     const options = [];
-    // Nothing sets this until the first gravestone is scrubbed, and
-    // `undefined < 5` is false -- which would offer "I cleaned them all" to a
-    // player who has not touched one.
-    const cleaned = player.cache.cleanedGravestones || 0;
+    // How many different graves they have scrubbed; nothing is recorded
+    // until the first one, so this is 0 for a player who has not touched one.
+    const cleaned = cleanedGravestoneCount(player);
 
     if (cleaned < GRAVESTONES_CLEANED_REQUIRED) {
         options.push(IS_IT_ENOUGH);
@@ -396,7 +399,7 @@ async function secondStage(player, ivan) {
         );
 
         player.questStages.groundskeepingTroubles = QUEST_STAGE_ERRAND3;
-        delete player.cache.cleanedGravestones;
+        forgetCleanedGravestones(player);
 
         await thirdStageStarted(player, ivan);
     }

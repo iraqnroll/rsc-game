@@ -26,6 +26,42 @@ const MAX_GHOSTS_FOR_NOTE = 3;
 // disturbed it and a player has at most one after them at a time.
 const ghostOwners = new Map();
 
+// The graves a player has scrubbed, kept as "x,y" in their cache. A plain
+// count let them scrub one gravestone five times over and call the errand
+// done, so the places are what is remembered now.
+function gravestoneKey(gameObject) {
+    return `${gameObject.x},${gameObject.y}`;
+}
+
+function cleanedGravestones(player) {
+    const cleaned = player.cache.cleanedGravestones;
+
+    if (Array.isArray(cleaned)) {
+        return cleaned;
+    }
+
+    // A save from when this was a count. Their progress stands, but which
+    // graves it was is lost, so those are stand-ins for graves not named.
+    if (typeof cleaned === 'number' && cleaned > 0) {
+        player.cache.cleanedGravestones = Array.from(
+            { length: cleaned },
+            (_, i) => `scrubbed-${i}`
+        );
+    } else {
+        player.cache.cleanedGravestones = [];
+    }
+
+    return player.cache.cleanedGravestones;
+}
+
+function cleanedGravestoneCount(player) {
+    return cleanedGravestones(player).length;
+}
+
+function forgetCleanedGravestones(player) {
+    delete player.cache.cleanedGravestones;
+}
+
 function hasGhost(player) {
     for (const ownerID of ghostOwners.values()) {
         if (ownerID === player.id) {
@@ -105,6 +141,14 @@ async function onUseWithGameObject(player, gameObject, item) {
     }
 
     const { world } = player;
+    const cleaned = cleanedGravestones(player);
+    const key = gravestoneKey(gameObject);
+
+    // Their water is worth more on a grave that still needs it.
+    if (cleaned.includes(key)) {
+        player.message('@que@This one is already scrubbed clean');
+        return true;
+    }
 
     player.message("@que@You wash the gravestone with water and begin to scrub it");
     player.sendBubble(BUCKET_OF_WATER);
@@ -114,11 +158,15 @@ async function onUseWithGameObject(player, gameObject, item) {
     player.inventory.remove(BUCKET_OF_WATER);
     player.inventory.add(EMPTY_BUCKET);
 
-    // The cache starts out empty, so the first scrub has nothing to add to.
-    player.cache.cleanedGravestones = (player.cache.cleanedGravestones || 0) + 1;
+    // Scrubbing takes a while, and they may have spent it on this same grave.
+    if (cleaned.includes(key)) {
+        player.message('@que@This one is already scrubbed clean');
+        return true;
+    }
 
-    const cleaned = player.cache.cleanedGravestones;
-    const left = GRAVESTONES_CLEANED_REQUIRED - cleaned;
+    cleaned.push(key);
+
+    const left = GRAVESTONES_CLEANED_REQUIRED - cleaned.length;
 
     if (left === 0) {
         player.message('@que@That is the last of them - Ivan can hardly complain now');
@@ -167,4 +215,10 @@ async function onNPCDeath(player, npc) {
     return false;
 }
 
-module.exports = { onUseWithGameObject, onNPCDeath, GRAVESTONES_CLEANED_REQUIRED };
+module.exports = {
+    onUseWithGameObject,
+    onNPCDeath,
+    cleanedGravestoneCount,
+    forgetCleanedGravestones,
+    GRAVESTONES_CLEANED_REQUIRED
+};
